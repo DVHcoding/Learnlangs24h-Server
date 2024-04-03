@@ -2,12 +2,17 @@
 // #      IMPORT NPM        #
 // ##########################
 import { Response } from "express";
+import { UserDocument } from "../models/userModel.js";
 
 // ##########################
 // #    IMPORT Components   #
 // ##########################
 
-const sendToken = async (user: any, statusCode: number, res: Response) => {
+const sendToken = async (
+  user: UserDocument,
+  statusCode: number,
+  res: Response
+) => {
   const token = user.getJWTToken();
   const refreshToken = await user.generateRefreshToken();
 

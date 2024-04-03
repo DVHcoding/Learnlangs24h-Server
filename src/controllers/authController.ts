@@ -10,12 +10,19 @@ import Users from "../models/userModel.js";
 import { TryCatch } from "../middleware/error.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import sendToken from "../utils/jwtToken.js";
+import { userDetailsType } from "../types/types.js";
 
 // ##########################
 // RegisterUser Controller
+type UserRequestType = {
+  username: string;
+  email: string;
+  password: string;
+};
+
 export const registerUser = TryCatch(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { username, email, password } = req.body;
+    const { username, email, password }: UserRequestType = req.body;
 
     if (!username || !email || !password) {
       return next(new ErrorHandler("Please add all fields", 400));
@@ -34,13 +41,13 @@ export const registerUser = TryCatch(
 // LoginUser Controller
 export const loginUser = TryCatch(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { email, password } = req.body;
+    const { email, password }: UserRequestType = req.body;
 
     if (!email || !password) {
       return next(new ErrorHandler("Please Enter Email & Password", 400));
     }
 
-    const user: any = await Users.findOne({ email }).select("+password"); // Phải thêm +password mới đem so sánh đc;
+    const user = await Users.findOne({ email }).select("+password"); // Phải thêm +password mới đem so sánh đc;
 
     if (!user) {
       return next(new ErrorHandler("Invalid Email or Password", 401));
@@ -58,7 +65,7 @@ export const loginUser = TryCatch(
 
 // Get Details User Controller
 export const detailsUser = TryCatch(
-  async (req: Request | any, res: Response, next: NextFunction) => {
+  async (req: userDetailsType, res: Response) => {
     const user = await Users.findById(req.user.id);
 
     res.status(200).json({

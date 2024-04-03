@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
 // ###############################
-interface UserType extends Document {
+export interface UserType extends mongoose.Document {
   username: string;
   email: string;
   password: string;
@@ -22,6 +22,12 @@ interface UserType extends Document {
   resetPasswordCode: string;
   resetPasswordExpire: Date;
   refreshToken: string;
+}
+
+export interface UserDocument extends UserType, mongoose.Document {
+  getJWTToken(): string;
+  generateRefreshToken(): Promise<string>;
+  comparePassword(enterPassword: string): Promise<boolean>;
 }
 
 // ##############################
@@ -71,13 +77,19 @@ const userSchema = new Schema({
 // ###################################
 // #  Mã hóa password trước khi lưu  #
 // ###################################
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
-    next();
-  }
+userSchema.pre(
+  "save",
+  async function (
+    this: UserType,
+    next: mongoose.CallbackWithoutResultAndOptionalError
+  ) {
+    if (!this.isModified("password")) {
+      next();
+    }
 
-  this.password = await bcrypt.hash(this.password as string, 10);
-});
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+);
 
 // ##########################
 // #       JWT TOKEN        #
@@ -97,8 +109,10 @@ userSchema.methods.getJWTToken = function (): string {
 // ##########################
 // #     REFRESH TOKEN      #
 // ##########################
-userSchema.methods.generateRefreshToken = async function (): Promise<string> {
-  const refreshToken = crypto.randomBytes(20).toString("hex");
+userSchema.methods.generateRefreshToken = async function (
+  this: UserType
+): Promise<string> {
+  const refreshToken: string = crypto.randomBytes(20).toString("hex");
   this.refreshToken = refreshToken;
   await this.save();
   return refreshToken;
@@ -107,9 +121,11 @@ userSchema.methods.generateRefreshToken = async function (): Promise<string> {
 // ##########################
 // #    COMPARE PASSWORD    #
 // ##########################
-userSchema.methods.comparePassword = async function (enterPassword: string) {
+userSchema.methods.comparePassword = async function (
+  enterPassword: string
+): Promise<boolean> {
   return await bcrypt.compare(enterPassword, this.password);
 };
 
-const Users = mongoose.model<UserType>("Users", userSchema);
+const Users = mongoose.model<UserDocument>("Users", userSchema);
 export default Users;

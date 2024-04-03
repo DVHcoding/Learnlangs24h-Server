@@ -7,7 +7,7 @@ import { Request, Response, NextFunction } from "express";
 // #    IMPORT Components   #
 // ##########################
 import ErrorHandler from "../utils/errorHandler.js";
-import { ControllerType } from "../types/types.js";
+import { ControllerType, userDetailsType } from "../types/types.js";
 
 // ##########################
 export const errorMiddleware = (
@@ -47,6 +47,6 @@ export const errorMiddleware = (
 // ###################################
 export const TryCatch =
   (func: ControllerType) =>
-  (req: Request, res: Response, next: NextFunction) => {
+  (req: userDetailsType, res: Response, next: NextFunction) => {
     return Promise.resolve(func(req, res, next)).catch(next);
   };
