@@ -12,7 +12,7 @@ import ErrorHandler from "../utils/errorHandler.js";
 import { userDetailsType } from "../types/types.js";
 
 export const isAuthenticated = async (
-  req: userDetailsType,
+  req: Request & { user?: userDetailsType["user"] },
   res: Response,
   next: NextFunction
 ) => {

@@ -65,9 +65,8 @@ export const loginUser = TryCatch(
 
 // Get Details User Controller
 export const detailsUser = TryCatch(
-  async (req: userDetailsType, res: Response) => {
-    const user = await Users.findById(req.user.id);
-
+  async (req: Request & { user?: userDetailsType["user"] }, res: Response) => {
+    const user = await Users.findById(req.user?.id);
     res.status(200).json({
       success: true,
       user,

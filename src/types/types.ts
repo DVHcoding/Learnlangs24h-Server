@@ -12,7 +12,7 @@ export interface userDetailsType extends Request {
 }
 
 export type ControllerType = (
-  req: userDetailsType,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => Promise<void | Response<any, Record<string, any>>>;
