@@ -6,6 +6,8 @@ import { NextFunction, Request, Response } from "express";
 export interface userDetailsType extends Request {
   user: {
     id: string;
+    username: string;
+    email: string;
   };
 }
 

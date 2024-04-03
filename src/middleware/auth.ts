@@ -9,9 +9,10 @@ import jwt from "jsonwebtoken";
 // ##########################
 import Users from "../models/userModel.js";
 import ErrorHandler from "../utils/errorHandler.js";
+import { userDetailsType } from "../types/types.js";
 
 export const isAuthenticated = async (
-  req: Request | any,
+  req: userDetailsType,
   res: Response,
   next: NextFunction
 ) => {
@@ -26,11 +27,13 @@ export const isAuthenticated = async (
       id: string;
     };
 
-    req.user = await Users.findById(decodedData.id);
+    req.user = (await Users.findById(
+      decodedData.id
+    )) as userDetailsType["user"];
 
     next();
   } catch (error) {
-    const user: any = await Users.findOne({
+    const user = await Users.findOne({
       refreshToken: refresh_token,
     }).select("+refreshToken");
 
@@ -58,7 +61,7 @@ export const isAuthenticated = async (
       .cookie("token", newToken, options)
       .cookie("refresh_token", newRefreshToken, options);
 
-    req.user = user;
+    req.user = user as userDetailsType["user"];
 
     next();
   }
