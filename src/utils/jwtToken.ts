@@ -41,8 +41,13 @@ const sendToken = async (
     .cookie("refresh_token", refreshToken, optionsRefresh)
     .json({
       success: true,
-      user,
-      token,
+      user: {
+        _id: user._id,
+        username: user.username,
+        createAt: user.createdAt,
+        email: user.email,
+        photo: user.photo.url,
+      },
     });
 };
 

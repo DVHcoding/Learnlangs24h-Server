@@ -40,7 +40,7 @@ export const errorMiddleware = (
 
   res.status(res.statusCode).json({
     success: false,
-    error: err.message,
+    message: err.message,
   });
 };
 

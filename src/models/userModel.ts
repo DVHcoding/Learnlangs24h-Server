@@ -12,7 +12,7 @@ export interface UserType extends mongoose.Document {
   username: string;
   email: string;
   password: string;
-  avatar: {
+  photo: {
     public_id: string;
     url: string;
   };
@@ -61,6 +61,7 @@ const userSchema = new Schema({
   googleId: {
     type: String,
     unique: true,
+    select: false,
   },
   createdAt: {
     type: Date,

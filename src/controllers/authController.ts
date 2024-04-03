@@ -47,7 +47,9 @@ export const loginUser = TryCatch(
       return next(new ErrorHandler("Please Enter Email & Password", 400));
     }
 
-    const user = await Users.findOne({ email }).select("+password"); // Phải thêm +password mới đem so sánh đc;
+    const user = await Users.findOne({ email }).select(
+      "+password -refreshToken"
+    ); // Phải thêm +password mới đem so sánh đc;
 
     if (!user) {
       return next(new ErrorHandler("Invalid Email or Password", 401));
