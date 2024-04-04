@@ -18,11 +18,15 @@ type UserRequestType = {
   username: string;
   email: string;
   password: string;
+  photo: {
+    public_id: string;
+    url: string;
+  };
 };
 
 export const registerUser = TryCatch(
   async (req: Request, res: Response, next: NextFunction) => {
-    const { username, email, password }: UserRequestType = req.body;
+    const { username, email, password, photo }: UserRequestType = req.body;
 
     if (!username || !email || !password) {
       return next(new ErrorHandler("Please add all fields", 400));
@@ -32,6 +36,10 @@ export const registerUser = TryCatch(
       username,
       email,
       password,
+      photo: {
+        public_id: photo.public_id,
+        url: photo.url,
+      },
     });
 
     sendToken(user, 200, res);
