@@ -8,6 +8,7 @@ export interface userDetailsType extends Request {
     id: string;
     username: string;
     email: string;
+    googleId?: string;
   };
 }
 

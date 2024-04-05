@@ -15,9 +15,15 @@ import { errorMiddleware } from "./middleware/error.js";
 
 const app = express();
 // ##########################
-app.use(cors());
+app.use(
+  cors({
+    origin: "",
+    credentials: true, // Bật chia sẻ cookie qua CORS
+  })
+);
+
 app.use(bodyParser.json()); // dùng để consol.log được req.body gửi về từ phía client
-app.use(bodyParser.urlencoded({ extended: false })); // dùng để consol.log được req.body gửi về từ phía client
+app.use(bodyParser.urlencoded({ extended: true })); // dùng để consol.log được req.body gửi về từ phía client
 app.use(cookieParser());
 
 // ##########################

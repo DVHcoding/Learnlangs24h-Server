@@ -16,53 +16,77 @@ export const isAuthenticated = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { token, refresh_token } = req.cookies;
+  const { token, refresh_token, googleId } = req.cookies;
 
-  if (!token && !refresh_token) {
-    return next(new ErrorHandler("Please Login to access this resource", 401));
-  }
+  if (googleId) {
+    const userFindGoogleId = await Users.findOne({ googleId });
 
-  try {
-    const decodedData = jwt.verify(token, process.env.JWT_SECRET!) as {
-      id: string;
+    if (!userFindGoogleId) {
+      return next(new ErrorHandler("Vui lòng đăng nhập lại!", 400));
+    }
+
+    req.user = userFindGoogleId as userDetailsType["user"];
+
+    const googleIdCookies = userFindGoogleId.googleId;
+    const millisecondsInOneDay = 24 * 60 * 60 * 1000;
+    const options = {
+      expires: new Date(Date.now() + 7 * millisecondsInOneDay),
+      httpOnly: true,
+      secure: true,
     };
 
-    req.user = (await Users.findById(
-      decodedData.id
-    )) as userDetailsType["user"];
+    res.cookie("googleId", googleIdCookies, options);
 
     next();
-  } catch (error) {
-    const user = await Users.findOne({
-      refreshToken: refresh_token,
-    }).select("+refreshToken");
-
-    if (!user || user.refreshToken !== refresh_token) {
+  } else {
+    if (!token && !refresh_token) {
       return next(
         new ErrorHandler("Please Login to access this resource", 401)
       );
     }
 
-    // Tạo mới token và refresh token
-    const newToken = user.getJWTToken();
-    const newRefreshToken = await user.generateRefreshToken();
+    try {
+      const decodedData = jwt.verify(token, process.env.JWT_SECRET!) as {
+        id: string;
+      };
 
-    const millisecondsInOneDay = 24 * 60 * 60 * 1000;
+      req.user = (await Users.findById(
+        decodedData.id
+      )) as userDetailsType["user"];
 
-    const options = {
-      expires: new Date(
-        Date.now() + Number(process.env.COOKIE_EXPIRE) * millisecondsInOneDay
-      ),
-      httpOnly: true,
-      secure: true,
-    };
+      next();
+    } catch (error) {
+      const user = await Users.findOne({
+        refreshToken: refresh_token,
+      }).select("+refreshToken");
 
-    res
-      .cookie("token", newToken, options)
-      .cookie("refresh_token", newRefreshToken, options);
+      if (!user || user.refreshToken !== refresh_token) {
+        return next(
+          new ErrorHandler("Please Login to access this resource", 401)
+        );
+      }
 
-    req.user = user as userDetailsType["user"];
+      // Tạo mới token và refresh token
+      const newToken = user.getJWTToken();
+      const newRefreshToken = await user.generateRefreshToken();
 
-    next();
+      const millisecondsInOneDay = 24 * 60 * 60 * 1000;
+
+      const options = {
+        expires: new Date(
+          Date.now() + Number(process.env.COOKIE_EXPIRE) * millisecondsInOneDay
+        ),
+        httpOnly: true,
+        secure: true,
+      };
+
+      res
+        .cookie("token", newToken, options)
+        .cookie("refresh_token", newRefreshToken, options);
+
+      req.user = user as userDetailsType["user"];
+
+      next();
+    }
   }
 };

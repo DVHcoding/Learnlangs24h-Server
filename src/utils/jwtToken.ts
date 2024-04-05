@@ -2,13 +2,13 @@
 // #      IMPORT NPM        #
 // ##########################
 import { Response } from "express";
-import { UserDocument } from "../models/userModel.js";
+import Users, { UserDocument } from "../models/userModel.js";
 
 // ##########################
 // #    IMPORT Components   #
 // ##########################
 
-const sendToken = async (
+export const sendToken = async (
   user: UserDocument,
   statusCode: number,
   res: Response
@@ -51,4 +51,32 @@ const sendToken = async (
     });
 };
 
-export default sendToken;
+export const sendGoogleToken = async (
+  user: UserDocument,
+  statusCode: number,
+  res: Response
+) => {
+  const token = user.googleId;
+
+  // options for cookie
+  const millisecondsInOneDay = 24 * 60 * 60 * 1000;
+  const options = {
+    expires: new Date(Date.now() + 7 * millisecondsInOneDay),
+    httpOnly: true,
+    secure: true,
+  };
+
+  res
+    .status(statusCode)
+    .cookie("googleId", token, options)
+    .json({
+      success: true,
+      user: {
+        _id: user._id,
+        username: user.username,
+        createAt: user.createdAt,
+        email: user.email,
+        photo: user.photo.url,
+      },
+    });
+};

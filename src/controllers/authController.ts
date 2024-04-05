@@ -9,21 +9,21 @@ import { NextFunction, Request, Response } from "express";
 import Users from "../models/userModel.js";
 import { TryCatch } from "../middleware/error.js";
 import ErrorHandler from "../utils/errorHandler.js";
-import sendToken from "../utils/jwtToken.js";
-import { userDetailsType } from "../types/types.js";
+import { sendGoogleToken, sendToken } from "../utils/jwtToken.js";
 
 // ##########################
-// RegisterUser Controller
 type UserRequestType = {
   username: string;
   email: string;
-  password: string;
+  password?: string;
   photo: {
     public_id: string;
     url: string;
   };
+  googleId?: string;
 };
 
+// RegisterUser Controller
 export const registerUser = TryCatch(
   async (req: Request, res: Response, next: NextFunction) => {
     const { username, email, password, photo }: UserRequestType = req.body;
@@ -46,7 +46,7 @@ export const registerUser = TryCatch(
   }
 );
 
-// LoginUser Controller
+// LoginUser Controller (With Email)
 export const loginUser = TryCatch(
   async (req: Request, res: Response, next: NextFunction) => {
     const { email, password }: UserRequestType = req.body;
@@ -73,13 +73,27 @@ export const loginUser = TryCatch(
   }
 );
 
-// Get Details User Controller
-export const detailsUser = TryCatch(
-  async (req: Request & { user?: userDetailsType["user"] }, res: Response) => {
-    const user = await Users.findById(req.user?.id);
-    res.status(200).json({
-      success: true,
-      user,
-    });
+// Login User Controller (With Google)
+export const loginGoogle = TryCatch(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { username, email, photo, googleId }: UserRequestType = req.body;
+
+    const user = await Users.findOne({ googleId });
+
+    if (!user) {
+      const userGoogle = await Users.create({
+        username,
+        email,
+        photo: {
+          public_id: photo.public_id,
+          url: photo.url,
+        },
+        googleId,
+      });
+
+      sendGoogleToken(userGoogle, 200, res);
+    } else {
+      sendGoogleToken(user, 200, res);
+    }
   }
 );
