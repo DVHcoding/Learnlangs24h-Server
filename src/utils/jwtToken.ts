@@ -77,6 +77,7 @@ export const sendGoogleToken = async (
         createAt: user.createdAt,
         email: user.email,
         photo: user.photo.url,
+        role:user.roles 
       },
     });
 };

@@ -97,3 +97,19 @@ export const loginGoogle = TryCatch(
     }
   }
 );
+
+// Logout
+export const logoutUser = TryCatch(async (req: Request, res: Response) => {
+  const cookiesToClear = ["token", "refresh_token", "googleId"];
+
+  cookiesToClear.forEach((cookieName) => {
+    res.clearCookie(cookieName, {
+      httpOnly: true,
+    });
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Đăng xuất thành công!",
+  });
+});
