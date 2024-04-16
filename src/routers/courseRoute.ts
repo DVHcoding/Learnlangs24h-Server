@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 // #    IMPORT Components   #
 // ##########################
 import { isAuthenticated } from "../middleware/auth.js";
-import { newCourse } from "../controllers/courseController.js";
+import { getAllCourses, newCourse } from "../controllers/courseController.js";
 import { Request, Response, NextFunction } from "express-serve-static-core";
 
 // config multer
@@ -34,5 +34,6 @@ const uploadConfig = (req: Request, res: Response, next: NextFunction) => {
 // ##########################
 const router: Router = express.Router();
 router.post("/new-course", isAuthenticated, uploadConfig, newCourse);
+router.get("/courses", getAllCourses);
 
 export default router;

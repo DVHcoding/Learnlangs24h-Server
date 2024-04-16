@@ -17,6 +17,19 @@ import cloudinary from "../config/cloudinary.js";
 
 // ##########################
 
+// Get All Courses
+export const getAllCourses = TryCatch(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const courses = await Course.find();
+
+    res.status(200).json({
+      success: true,
+      courses,
+    });
+  }
+);
+
+// Create New Course
 export const newCourse = TryCatch(
   async (req: Request, res: Response, next: NextFunction) => {
     const { unitName }: { unitName: string } = req.body;
