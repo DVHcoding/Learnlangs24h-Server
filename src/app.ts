@@ -11,6 +11,8 @@ import cookieParser from "cookie-parser";
 // ##########################
 import userRoute from "./routers/userRoute.js";
 import authRoute from "./routers/authRoute.js";
+import courseRoute from "./routers/courseRoute.js";
+
 import { errorMiddleware } from "./middleware/error.js";
 
 const app = express();
@@ -31,6 +33,7 @@ app.use(cookieParser());
 // ##########################
 app.use("/api/v1", userRoute);
 app.use("/api/v1", authRoute);
+app.use("/api/v1", courseRoute);
 
 // ############################
 // # Handler middleware error #

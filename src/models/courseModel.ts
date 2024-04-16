@@ -31,7 +31,7 @@ const courseSchema = new Schema({
     },
   },
   createAt: {
-    type: String,
+    type: Date,
     default: Date.now,
   },
   rating: {

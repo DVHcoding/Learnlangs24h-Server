@@ -10,7 +10,7 @@ dotenv.config();
 import app from "./app.js";
 import connectDatabase from "./config/database.js";
 
-// ##########################
+// Mongodb
 connectDatabase();
 
 // ##########################
