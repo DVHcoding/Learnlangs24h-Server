@@ -1,7 +1,7 @@
 // ##########################
 // #      IMPORT NPM        #
 // ##########################
-import express, { Router } from "express";
+import express, { Router, Request, Response, NextFunction } from "express";
 import multer from "multer";
 import { fileURLToPath } from "url";
 import path from "path";
@@ -12,8 +12,11 @@ const __dirname = path.dirname(__filename);
 // #    IMPORT Components   #
 // ##########################
 import { isAuthenticated } from "../middleware/auth.js";
-import { getAllCourses, newCourse } from "../controllers/courseController.js";
-import { Request, Response, NextFunction } from "express-serve-static-core";
+import {
+  getAllCourses,
+  newCourse,
+  newLesson,
+} from "../controllers/courseController.js";
 
 // config multer
 const upload = multer({
@@ -34,6 +37,7 @@ const uploadConfig = (req: Request, res: Response, next: NextFunction) => {
 // ##########################
 const router: Router = express.Router();
 router.post("/new-course", isAuthenticated, uploadConfig, newCourse);
+router.post("/new-lesson", isAuthenticated, newLesson);
 router.get("/courses", getAllCourses);
 
 export default router;

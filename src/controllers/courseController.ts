@@ -13,6 +13,7 @@ const __dirname = path.dirname(__filename);
 // ##########################
 import { TryCatch } from "../middleware/error.js";
 import Course from "../models/courseModel.js";
+import Lesson from "../models/lessonModel.js";
 import cloudinary from "../config/cloudinary.js";
 
 // ##########################
@@ -68,6 +69,23 @@ export const newCourse = TryCatch(
     res.status(200).json({
       success: true,
       message: "Create Course Successfully!",
+    });
+  }
+);
+
+export const newLesson = TryCatch(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { name, courseId }: { name: string; courseId: string } = req.body;
+
+    await Lesson.create({
+      name,
+      createAt: Date.now(),
+      course: courseId,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Create a new lesson successfully",
     });
   }
 );
