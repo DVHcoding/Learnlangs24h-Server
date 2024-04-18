@@ -15,6 +15,7 @@ import { TryCatch } from "../middleware/error.js";
 import Course from "../models/courseModel.js";
 import Lesson from "../models/lessonModel.js";
 import cloudinary from "../config/cloudinary.js";
+import ErrorHandler from "../utils/errorHandler.js";
 
 // ##########################
 
@@ -26,6 +27,22 @@ export const getAllCourses = TryCatch(
     res.status(200).json({
       success: true,
       courses,
+    });
+  }
+);
+
+// Get All Lessons By Id
+export const getAllLessonsByCourseId = TryCatch(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const lessons = await Lesson.find({ course: req.params.id });
+
+    if (!lessons || lessons.length === 0) {
+      return next(new ErrorHandler("Lessons is not found", 404));
+    }
+
+    res.status(200).json({
+      success: true,
+      lessons,
     });
   }
 );
@@ -73,6 +90,7 @@ export const newCourse = TryCatch(
   }
 );
 
+// Create New Lesson
 export const newLesson = TryCatch(
   async (req: Request, res: Response, next: NextFunction) => {
     const { name, courseId }: { name: string; courseId: string } = req.body;

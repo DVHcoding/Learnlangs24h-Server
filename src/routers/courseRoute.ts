@@ -14,6 +14,7 @@ const __dirname = path.dirname(__filename);
 import { isAuthenticated } from "../middleware/auth.js";
 import {
   getAllCourses,
+  getAllLessonsByCourseId,
   newCourse,
   newLesson,
 } from "../controllers/courseController.js";
@@ -39,5 +40,6 @@ const router: Router = express.Router();
 router.post("/new-course", isAuthenticated, uploadConfig, newCourse);
 router.post("/new-lesson", isAuthenticated, newLesson);
 router.get("/courses", getAllCourses);
+router.get("/lessons/:id", getAllLessonsByCourseId);
 
 export default router;
