@@ -15,8 +15,10 @@ import { isAuthenticated } from "../middleware/auth.js";
 import {
   getAllCourses,
   getAllLessonsByCourseId,
+  getAllUnitLesson,
   newCourse,
   newLesson,
+  newUnitLesson,
 } from "../controllers/courseController.js";
 
 // config multer
@@ -37,9 +39,12 @@ const uploadConfig = (req: Request, res: Response, next: NextFunction) => {
 
 // ##########################
 const router: Router = express.Router();
-router.post("/new-course", isAuthenticated, uploadConfig, newCourse);
-router.post("/new-lesson", isAuthenticated, newLesson);
 router.get("/courses", getAllCourses);
 router.get("/lessons/:id", getAllLessonsByCourseId);
+router.get("/unitLessons/:id", getAllUnitLesson);
+
+router.post("/new-course", isAuthenticated, uploadConfig, newCourse);
+router.post("/new-lesson", isAuthenticated, newLesson);
+router.post("/new-unitLesson", isAuthenticated, newUnitLesson);
 
 export default router;

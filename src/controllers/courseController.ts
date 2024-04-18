@@ -14,6 +14,7 @@ const __dirname = path.dirname(__filename);
 import { TryCatch } from "../middleware/error.js";
 import Course from "../models/courseModel.js";
 import Lesson from "../models/lessonModel.js";
+import UnitLesson from "../models/unitLessonModel.js";
 import cloudinary from "../config/cloudinary.js";
 import ErrorHandler from "../utils/errorHandler.js";
 
@@ -43,6 +44,18 @@ export const getAllLessonsByCourseId = TryCatch(
     res.status(200).json({
       success: true,
       lessons,
+    });
+  }
+);
+
+// Get All Unit Lessons
+export const getAllUnitLesson = TryCatch(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const unitLessons = await UnitLesson.find({ course: req.params.id });
+
+    res.status(200).json({
+      success: true,
+      unitLessons,
     });
   }
 );
@@ -104,6 +117,28 @@ export const newLesson = TryCatch(
     res.status(200).json({
       success: true,
       message: "Create a new lesson successfully",
+    });
+  }
+);
+
+// Create New UnitLesson
+export const newUnitLesson = TryCatch(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { title, time, icon, lectureType, lesson, course } = req.body;
+
+    await UnitLesson.create({
+      title,
+      time,
+      icon,
+      lectureType,
+      createAt: Date.now(),
+      lesson,
+      course,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Create Unit Lesson successfully",
     });
   }
 );
