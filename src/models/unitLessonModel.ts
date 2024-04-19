@@ -1,7 +1,7 @@
 // ##########################
 // #      IMPORT NPM        #
 // ##########################
-import mongoose, { Schema, mongo } from "mongoose";
+import mongoose, { Schema  } from "mongoose";
 
 // ##########################
 // #    IMPORT Components   #

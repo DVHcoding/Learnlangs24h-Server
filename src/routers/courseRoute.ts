@@ -13,9 +13,11 @@ const __dirname = path.dirname(__filename);
 // ##########################
 import { isAuthenticated } from "../middleware/auth.js";
 import {
+  createContentUnitLesson,
   getAllCourses,
   getAllLessonsByCourseId,
-  getAllUnitLesson,
+  getAllUnitLessonByCourseId,
+  getAllUnitLessonByLessonId,
   newCourse,
   newLesson,
   newUnitLesson,
@@ -41,10 +43,16 @@ const uploadConfig = (req: Request, res: Response, next: NextFunction) => {
 const router: Router = express.Router();
 router.get("/courses", getAllCourses);
 router.get("/lessons/:id", getAllLessonsByCourseId);
-router.get("/unitLessons/:id", getAllUnitLesson);
+router.get("/unitLessons/:id", getAllUnitLessonByCourseId);
+router.get("/unitLessonsByLessonId/:id", getAllUnitLessonByLessonId);
 
 router.post("/new-course", isAuthenticated, uploadConfig, newCourse);
 router.post("/new-lesson", isAuthenticated, newLesson);
 router.post("/new-unitLesson", isAuthenticated, newUnitLesson);
+router.post(
+  "/new-content-unitLesson",
+  isAuthenticated,
+  createContentUnitLesson
+);
 
 export default router;

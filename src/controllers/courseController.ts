@@ -15,6 +15,7 @@ import { TryCatch } from "../middleware/error.js";
 import Course from "../models/courseModel.js";
 import Lesson from "../models/lessonModel.js";
 import UnitLesson from "../models/unitLessonModel.js";
+import VideoLecture from "../models/videoLectureModel.js";
 import cloudinary from "../config/cloudinary.js";
 import ErrorHandler from "../utils/errorHandler.js";
 
@@ -48,10 +49,30 @@ export const getAllLessonsByCourseId = TryCatch(
   }
 );
 
-// Get All Unit Lessons
-export const getAllUnitLesson = TryCatch(
+// Get All Unit Lessons By CourseID
+export const getAllUnitLessonByCourseId = TryCatch(
   async (req: Request, res: Response, next: NextFunction) => {
     const unitLessons = await UnitLesson.find({ course: req.params.id });
+
+    if (!unitLessons || unitLessons.length === 0) {
+      return next(new ErrorHandler("unitLessons not found!", 404));
+    }
+
+    res.status(200).json({
+      success: true,
+      unitLessons,
+    });
+  }
+);
+
+// Get All Unit Lessons By Lesson Id
+export const getAllUnitLessonByLessonId = TryCatch(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const unitLessons = await UnitLesson.find({ lesson: req.params.id });
+
+    if (!unitLessons || unitLessons.length === 0) {
+      return next(new ErrorHandler("Unit Lessons not found", 404));
+    }
 
     res.status(200).json({
       success: true,
@@ -139,6 +160,32 @@ export const newUnitLesson = TryCatch(
     res.status(200).json({
       success: true,
       message: "Create Unit Lesson successfully",
+    });
+  }
+);
+
+// Create Content for UnitLesson
+export const createContentUnitLesson = TryCatch(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const {
+      videoUrl,
+      description,
+      unitLesson,
+    }: { videoUrl: string; description: string; unitLesson: string } = req.body;
+
+    if (videoUrl === "" || description === "" || unitLesson === "") {
+      return next(new ErrorHandler("Please enter all fields", 400));
+    }
+
+    await VideoLecture.create({
+      videoUrl,
+      description,
+      unitLesson,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Create new content successfully!",
     });
   }
 );
