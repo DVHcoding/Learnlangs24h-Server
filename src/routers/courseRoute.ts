@@ -18,9 +18,11 @@ import {
   getAllLessonsByCourseId,
   getAllUnitLessonByCourseId,
   getAllUnitLessonByLessonId,
+  getFillBlankExercise,
   getUnitLessonById,
   getVideoLectureContent,
   newCourse,
+  newFillBlankExercise,
   newLesson,
   newUnitLesson,
 } from "../controllers/courseController.js";
@@ -50,6 +52,7 @@ router.get("/unitLessons/:id", getAllUnitLessonByCourseId);
 router.get("/unitLessonsByLessonId/:id", getAllUnitLessonByLessonId);
 router.get("/unitLesson/:id", getUnitLessonById);
 router.get("/videoLectureContent/:id", getVideoLectureContent);
+router.get("/fillBlankExercise/:id", getFillBlankExercise);
 
 // ########## POST ###########
 router.post("/new-course", isAuthenticated, uploadConfig, newCourse);
@@ -60,5 +63,6 @@ router.post(
   isAuthenticated,
   createContentUnitLesson
 );
+router.post("/newFillBlankExercise", isAuthenticated, newFillBlankExercise);
 
 export default router;

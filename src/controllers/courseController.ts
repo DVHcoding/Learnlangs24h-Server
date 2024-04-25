@@ -18,6 +18,9 @@ import UnitLesson from "../models/unitLessonModel.js";
 import VideoLecture from "../models/videoLectureModel.js";
 import cloudinary from "../config/cloudinary.js";
 import ErrorHandler from "../utils/errorHandler.js";
+import FillBlankExercise, {
+  Question,
+} from "../models/fillBlankExerciseModel.js";
 
 // ##########################
 // #          GET           #
@@ -114,6 +117,24 @@ export const getVideoLectureContent = TryCatch(
     res.status(200).json({
       success: true,
       videoLectureContent,
+    });
+  }
+);
+
+// Get FillBlankExercise By Unit Lesson Id
+export const getFillBlankExercise = TryCatch(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const fillBlankExercise = await FillBlankExercise.find({
+      unitLesson: req.params.id,
+    });
+
+    if (!fillBlankExercise) {
+      return next(new ErrorHandler("Fill In Blank Question not found!", 404));
+    }
+
+    res.status(200).json({
+      success: true,
+      fillBlankExercise,
     });
   }
 );
@@ -227,6 +248,30 @@ export const createContentUnitLesson = TryCatch(
     res.status(200).json({
       success: true,
       message: "Create new content successfully!",
+    });
+  }
+);
+
+// Create fillBlankExercise
+export const newFillBlankExercise = TryCatch(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const {
+      unitLesson,
+      questions,
+    }: { unitLesson: string; questions: Question[] } = req.body;
+
+    if (!unitLesson || !questions) {
+      return next(new ErrorHandler("Please enter all fields", 400));
+    }
+
+    await FillBlankExercise.create({
+      unitLesson,
+      questions,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Created a new fill-in-the-blank exercise successfully",
     });
   }
 );
