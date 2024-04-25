@@ -20,7 +20,8 @@ import cloudinary from "../config/cloudinary.js";
 import ErrorHandler from "../utils/errorHandler.js";
 
 // ##########################
-
+// #          GET           #
+// ##########################
 // Get All Courses
 export const getAllCourses = TryCatch(
   async (req: Request, res: Response, next: NextFunction) => {
@@ -38,7 +39,7 @@ export const getAllLessonsByCourseId = TryCatch(
   async (req: Request, res: Response, next: NextFunction) => {
     const lessons = await Lesson.find({ course: req.params.id });
 
-    if (!lessons || lessons.length === 0) {
+    if (!lessons || lessons.length === 0 || lessons == null) {
       return next(new ErrorHandler("Lessons is not found", 404));
     }
 
@@ -68,7 +69,9 @@ export const getAllUnitLessonByCourseId = TryCatch(
 // Get All Unit Lessons By Lesson Id
 export const getAllUnitLessonByLessonId = TryCatch(
   async (req: Request, res: Response, next: NextFunction) => {
-    const unitLessons = await UnitLesson.find({ lesson: req.params.id });
+    const unitLessons = await UnitLesson.find({
+      lesson: req.params.id,
+    });
 
     if (!unitLessons || unitLessons.length === 0) {
       return next(new ErrorHandler("Unit Lessons not found", 404));
@@ -80,6 +83,44 @@ export const getAllUnitLessonByLessonId = TryCatch(
     });
   }
 );
+
+// Get UnitLesson By id
+export const getUnitLessonById = TryCatch(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const unitLesson = await UnitLesson.findById(req.params.id);
+
+    if (!unitLesson) {
+      return next(new ErrorHandler("UnitLesson not found!", 404));
+    }
+
+    res.status(200).json({
+      success: true,
+      unitLesson,
+    });
+  }
+);
+
+// Get Video Lecture By Unit Lesson Id
+export const getVideoLectureContent = TryCatch(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const videoLectureContent = await VideoLecture.findOne({
+      unitLesson: req.params.id,
+    });
+
+    if (!videoLectureContent) {
+      return next(new ErrorHandler("Video Lecture content not found!", 404));
+    }
+
+    res.status(200).json({
+      success: true,
+      videoLectureContent,
+    });
+  }
+);
+
+// ##########################
+// #        CREATE          #
+// ##########################
 
 // Create New Course
 export const newCourse = TryCatch(

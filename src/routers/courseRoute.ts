@@ -18,6 +18,8 @@ import {
   getAllLessonsByCourseId,
   getAllUnitLessonByCourseId,
   getAllUnitLessonByLessonId,
+  getUnitLessonById,
+  getVideoLectureContent,
   newCourse,
   newLesson,
   newUnitLesson,
@@ -41,11 +43,15 @@ const uploadConfig = (req: Request, res: Response, next: NextFunction) => {
 
 // ##########################
 const router: Router = express.Router();
+// ########## GET ###########
 router.get("/courses", getAllCourses);
 router.get("/lessons/:id", getAllLessonsByCourseId);
 router.get("/unitLessons/:id", getAllUnitLessonByCourseId);
 router.get("/unitLessonsByLessonId/:id", getAllUnitLessonByLessonId);
+router.get("/unitLesson/:id", getUnitLessonById);
+router.get("/videoLectureContent/:id", getVideoLectureContent);
 
+// ########## POST ###########
 router.post("/new-course", isAuthenticated, uploadConfig, newCourse);
 router.post("/new-lesson", isAuthenticated, newLesson);
 router.post("/new-unitLesson", isAuthenticated, newUnitLesson);
