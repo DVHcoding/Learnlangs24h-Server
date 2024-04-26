@@ -124,7 +124,7 @@ export const getVideoLectureContent = TryCatch(
 // Get FillBlankExercise By Unit Lesson Id
 export const getFillBlankExercise = TryCatch(
   async (req: Request, res: Response, next: NextFunction) => {
-    const fillBlankExercise = await FillBlankExercise.find({
+    const fillBlankExercise = await FillBlankExercise.findOne({
       unitLesson: req.params.id,
     });
 

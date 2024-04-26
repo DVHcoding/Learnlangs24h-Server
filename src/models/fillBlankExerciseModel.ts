@@ -14,8 +14,8 @@ export interface fillBlankExerciseType extends mongoose.Document {
 
 export interface Question {
   sentence: string;
-  correctAnswers: string;
-  otherAnswers: string;
+  correctAnswers: string[];
+  otherAnswers: string[];
 }
 
 const fillBlankExerciseSchema = new Schema({
@@ -31,11 +31,11 @@ const fillBlankExerciseSchema = new Schema({
         required: true,
       },
       correctAnswer: {
-        type: String,
+        type: [String],
         required: true,
       },
       otherAnswer: {
-        type: String,
+        type: [String],
       },
     },
   ],
