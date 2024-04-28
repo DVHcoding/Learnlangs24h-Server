@@ -72,6 +72,11 @@ export const getAllUnitLessonByCourseId = TryCatch(
 // Get All Unit Lessons By Lesson Id
 export const getAllUnitLessonByLessonId = TryCatch(
   async (req: Request, res: Response, next: NextFunction) => {
+    // Kiểm tra xem params có tồn tại không và không rỗng
+    if (!req.params.id) {
+      return next(new ErrorHandler("Params not found", 400));
+    }
+
     const unitLessons = await UnitLesson.find({
       lesson: req.params.id,
     });
