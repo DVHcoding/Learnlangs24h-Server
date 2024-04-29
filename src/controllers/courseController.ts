@@ -7,12 +7,17 @@ import { fileURLToPath } from "url";
 import path from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+import NodeCache from "node-cache";
+
+const nodeCache = new NodeCache({
+  stdTTL: 3600,
+});
 
 // ##########################
 // #    IMPORT Components   #
 // ##########################
 import { TryCatch } from "../middleware/error.js";
-import Course from "../models/courseModel.js";
+import Course, { CourseType } from "../models/courseModel.js";
 import Lesson from "../models/lessonModel.js";
 import UnitLesson from "../models/unitLessonModel.js";
 import VideoLecture from "../models/videoLectureModel.js";
@@ -28,7 +33,14 @@ import FillBlankExercise, {
 // Get All Courses
 export const getAllCourses = TryCatch(
   async (req: Request, res: Response, next: NextFunction) => {
-    const courses = await Course.find();
+    let courses: CourseType[];
+
+    if (nodeCache.has("courses")) {
+      courses = JSON.parse(nodeCache.get<string | any>("courses"));
+    } else {
+      courses = await Course.find();
+      nodeCache.set("courses", JSON.stringify(courses));
+    }
 
     res.status(200).json({
       success: true,
