@@ -20,6 +20,7 @@ import {
   getAllUnitLessonByLessonId,
   getFillBlankExercise,
   getUnitLessonById,
+  getUserProcessStatus,
   getVideoLectureContent,
   newCourse,
   newFillBlankExercise,
@@ -54,6 +55,7 @@ router.get("/unitLessonsByLessonId/:id?", getAllUnitLessonByLessonId);
 router.get("/unitLesson/:id", getUnitLessonById);
 router.get("/videoLectureContent/:id", getVideoLectureContent);
 router.get("/fillBlankExercise/:id", getFillBlankExercise);
+router.get("/userProcessStatuses/:id", isAuthenticated, getUserProcessStatus);
 
 // ########## POST ###########
 router.post("/new-course", isAuthenticated, uploadConfig, newCourse);

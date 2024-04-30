@@ -157,6 +157,24 @@ export const getFillBlankExercise = TryCatch(
   }
 );
 
+// Get UserProcessStatus
+export const getUserProcessStatus = TryCatch(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const unitLessonStatus = await UserProcessStatus.find({
+      userId: req.params.id,
+    }).populate("unitLessonId");
+
+    if (!unitLessonStatus || unitLessonStatus.length === 0) {
+      return next(new ErrorHandler("UserId not found!", 404));
+    }
+
+    res.status(200).json({
+      success: true,
+      unitLessonStatus,
+    });
+  }
+);
+
 // ##########################
 // #        CREATE          #
 // ##########################
