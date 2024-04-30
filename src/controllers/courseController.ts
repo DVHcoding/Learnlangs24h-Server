@@ -26,6 +26,7 @@ import ErrorHandler from "../utils/errorHandler.js";
 import FillBlankExercise, {
   Question,
 } from "../models/fillBlankExerciseModel.js";
+import UserProcessStatus from "../models/userProcessStatusModel.js";
 
 // ##########################
 // #          GET           #
@@ -289,6 +290,25 @@ export const newFillBlankExercise = TryCatch(
     res.status(200).json({
       success: true,
       message: "Created a new fill-in-the-blank exercise successfully",
+    });
+  }
+);
+
+// Create New UserProcessStatus
+export const newUserProcessStatus = TryCatch(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { userId, unitLessonId }: { userId: string; unitLessonId: string } =
+      req.body;
+
+    if (!userId || !unitLessonId) {
+      return next(new ErrorHandler("Please enter all fields!", 400));
+    }
+
+    await UserProcessStatus.create({ userId, unitLessonId });
+
+    res.status(200).json({
+      success: true,
+      message: "Create new user process status successfully",
     });
   }
 );

@@ -25,6 +25,7 @@ import {
   newFillBlankExercise,
   newLesson,
   newUnitLesson,
+  newUserProcessStatus,
 } from "../controllers/courseController.js";
 
 // config multer
@@ -64,5 +65,6 @@ router.post(
   createContentUnitLesson
 );
 router.post("/newFillBlankExercise", isAuthenticated, newFillBlankExercise);
+router.post("/newUserProcessStatus", newUserProcessStatus);
 
 export default router;
