@@ -158,7 +158,8 @@ export const getUserProcessStatus = TryCatch(async (req: Request, res: Response,
 });
 
 export const getUnitLessonIdFromUserProcess = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
-    const { userId, unitLessonId }: { userId: string; unitLessonId: string } = req.body;
+    const { userId, unitLessonId } = req.query as { userId: string; unitLessonId: string };
+
     const userProcessStatus = await UserProcessStatus.find({ userId, unitLessonId });
 
     if (!userProcessStatus || userProcessStatus.length === 0) {

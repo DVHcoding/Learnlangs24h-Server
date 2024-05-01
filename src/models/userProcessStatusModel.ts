@@ -23,6 +23,7 @@ const userProcessStatusSchema = new Schema({
     unitLessonId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'UnitLesson',
+        unique: true,
     },
     status: {
         type: String,

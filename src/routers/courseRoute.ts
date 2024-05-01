@@ -57,6 +57,7 @@ router.get('/unitLesson/:id', getUnitLessonById);
 router.get('/videoLectureContent/:id', getVideoLectureContent);
 router.get('/fillBlankExercise/:id', getFillBlankExercise);
 router.get('/userProcessStatuses/:id', isAuthenticated, getUserProcessStatus);
+router.get('/unitLessonIdByUserProcess', isAuthenticated, getUnitLessonIdFromUserProcess);
 
 // ########## POST ###########
 router.post('/new-course', isAuthenticated, uploadConfig, newCourse);
@@ -65,6 +66,5 @@ router.post('/new-unitLesson', isAuthenticated, newUnitLesson);
 router.post('/new-content-unitLesson', isAuthenticated, createContentUnitLesson);
 router.post('/newFillBlankExercise', isAuthenticated, newFillBlankExercise);
 router.post('/newUserProcessStatus', isAuthenticated, newUserProcessStatus);
-router.post('/unitLessonIdByUserProcess', isAuthenticated, getUnitLessonIdFromUserProcess);
 
 export default router;
