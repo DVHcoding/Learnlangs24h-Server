@@ -157,6 +157,20 @@ export const getUserProcessStatus = TryCatch(async (req: Request, res: Response,
     });
 });
 
+export const getUnitLessonIdFromUserProcess = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    const { userId, unitLessonId }: { userId: string; unitLessonId: string } = req.body;
+    const userProcessStatus = await UserProcessStatus.find({ userId, unitLessonId });
+
+    if (!userProcessStatus || userProcessStatus.length === 0) {
+        return next(new ErrorHandler('user process status not found!', 404));
+    }
+
+    res.status(200).json({
+        success: true,
+        userProcessStatus,
+    });
+});
+
 // ##########################
 // #        CREATE          #
 // ##########################
