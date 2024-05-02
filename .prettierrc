@@ -1,9 +1,9 @@
 {
-  "singleQuote": true,
-  "semi": true,
-  "tabWidth": 4,
-  "useTabs": false,
-  "bracketSpacing": true,
-  "printWidth": 140,
-  "editor.formatOnType": false
+    "singleQuote": true,
+    "semi": true,
+    "tabWidth": 4,
+    "useTabs": false,
+    "bracketSpacing": true,
+    "printWidth": 140,
+    "editor.formatOnType": false
 }

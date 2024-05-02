@@ -1,15 +1,15 @@
 // ##########################
 // #      IMPORT NPM        #
 // ##########################
-import dotenv from "dotenv";
-import os from "os";
+import dotenv from 'dotenv';
+import os from 'os';
 dotenv.config();
 
 // ##########################
 // #    IMPORT Components   #
 // ##########################
-import app from "./app.js";
-import connectDatabase from "./config/database.js";
+import app from './app.js';
+import connectDatabase from './config/database.js';
 
 // Lấy số lượng CPU của hệ thống
 const numCPUs = os.cpus().length;
@@ -25,5 +25,5 @@ connectDatabase();
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
-  console.log(`Server is working on http://localhost:${PORT}`);
+    console.log(`Server is working on http://localhost:${PORT}`);
 });

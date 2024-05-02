@@ -25,6 +25,7 @@ import cloudinary from '../config/cloudinary.js';
 import ErrorHandler from '../utils/errorHandler.js';
 import FillBlankExercise, { Question } from '../models/fillBlankExerciseModel.js';
 import UserProcessStatus from '../models/userProcessStatusModel.js';
+import { CreateContentUnitLessonRequestType } from '../types/types.js';
 
 /* -------------------------------------------------------------------------- */
 /*                                     GET                                    */
@@ -254,14 +255,15 @@ export const newUnitLesson = TryCatch(async (req: Request, res: Response, next: 
 
 // Create Content for UnitLesson
 export const createContentUnitLesson = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
-    const { videoUrl, description, unitLesson }: { videoUrl: string; description: string; unitLesson: string } = req.body;
+    const { videoUrl, totalTime, description, unitLesson }: CreateContentUnitLessonRequestType = req.body;
 
-    if (videoUrl === '' || description === '' || unitLesson === '') {
+    if (videoUrl === '' || totalTime === '' || description === '' || unitLesson === '') {
         return next(new ErrorHandler('Please enter all fields', 400));
     }
 
     await VideoLecture.create({
         videoUrl,
+        totalTime,
         description,
         unitLesson,
     });
