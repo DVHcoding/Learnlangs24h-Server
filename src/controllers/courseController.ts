@@ -26,9 +26,9 @@ import ErrorHandler from '../utils/errorHandler.js';
 import FillBlankExercise, { Question } from '../models/fillBlankExerciseModel.js';
 import UserProcessStatus from '../models/userProcessStatusModel.js';
 
-// ##########################
-// #          GET           #
-// ##########################
+/* -------------------------------------------------------------------------- */
+/*                                     GET                                    */
+/* -------------------------------------------------------------------------- */
 // Get All Courses
 export const getAllCourses = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
     let courses: CourseType[];
@@ -172,10 +172,9 @@ export const getUnitLessonIdFromUserProcess = TryCatch(async (req: Request, res:
     });
 });
 
-// ##########################
-// #        CREATE          #
-// ##########################
-
+/* -------------------------------------------------------------------------- */
+/*                                   CREATE                                   */
+/* -------------------------------------------------------------------------- */
 // Create New Course
 export const newCourse = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
     const { unitName }: { unitName: string } = req.body;
@@ -305,5 +304,30 @@ export const newUserProcessStatus = TryCatch(async (req: Request, res: Response,
     res.status(200).json({
         success: true,
         message: 'Create new user process status successfully',
+    });
+});
+
+/* -------------------------------------------------------------------------- */
+/*                                   UPDATE                                   */
+/* -------------------------------------------------------------------------- */
+
+export const updateUserProcessStatus = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    const { userId, unitLessonId }: { userId: string; unitLessonId: string } = req.body;
+
+    if (!userId || !unitLessonId) {
+        return next(new ErrorHandler('Please enter all fields', 400));
+    }
+
+    const userProcessStatus = await UserProcessStatus.findOneAndUpdate({ userId, unitLessonId }, { status: 'completed' });
+
+    if (!userProcessStatus) {
+        return next(new ErrorHandler('user process not found!', 404));
+    }
+
+    await userProcessStatus.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'update status successfully!',
     });
 });

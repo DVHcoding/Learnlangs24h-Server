@@ -28,6 +28,7 @@ import {
     newLesson,
     newUnitLesson,
     newUserProcessStatus,
+    updateUserProcessStatus,
 } from '../controllers/courseController.js';
 
 // config multer
@@ -66,5 +67,8 @@ router.post('/new-unitLesson', isAuthenticated, newUnitLesson);
 router.post('/new-content-unitLesson', isAuthenticated, createContentUnitLesson);
 router.post('/newFillBlankExercise', isAuthenticated, newFillBlankExercise);
 router.post('/newUserProcessStatus', isAuthenticated, newUserProcessStatus);
+
+// ########## PUT ###########
+router.put('/updateUserProcessStatus', isAuthenticated, updateUserProcessStatus);
 
 export default router;
