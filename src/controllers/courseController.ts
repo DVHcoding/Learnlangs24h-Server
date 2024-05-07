@@ -25,7 +25,7 @@ import cloudinary from '../config/cloudinary.js';
 import ErrorHandler from '../utils/errorHandler.js';
 import FillBlankExercise, { Question } from '../models/fillBlankExerciseModel.js';
 import UserProcessStatus from '../models/userProcessStatusModel.js';
-import { CreateContentUnitLessonRequestType } from '../types/types.js';
+import { CreateContentUnitLessonRequestType, UpdateUnitLessonAndVideoLectureContentType } from '../types/types.js';
 
 /* -------------------------------------------------------------------------- */
 /*                                     GET                                    */
@@ -313,6 +313,36 @@ export const newUserProcessStatus = TryCatch(async (req: Request, res: Response,
 /*                                   UPDATE                                   */
 /* -------------------------------------------------------------------------- */
 
+// Update UnitLesson + VideoLectureContent
+export const updateUnitLessonAndVideoLectureContent = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    const { _id, title, time, lesson, videoUrl, totalTime, description }: UpdateUnitLessonAndVideoLectureContentType = req.body;
+
+    if (!title || !time || !lesson || !videoUrl || !totalTime || !description) {
+        return next(new ErrorHandler('Please Enter All Fields!', 400));
+    }
+
+    // Cập nhật nội nội dung unitLesson model
+    const unitLesson = await UnitLesson.findByIdAndUpdate(_id, { title, time, lesson, createAt: Date.now() });
+    if (!unitLesson) {
+        return next(new ErrorHandler('Unit Lesson Id not found!', 404));
+    }
+    await unitLesson.save();
+
+    // Cập nhật nội dung videoLectureContent  model
+    const videoLectureContent = await VideoLecture.findOneAndUpdate({ unitLesson: _id }, { videoUrl, description, totalTime });
+    if (!videoLectureContent) {
+        return next(new ErrorHandler('Unit Lesson Id not found!', 404));
+    }
+
+    await videoLectureContent.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'Update Unit Lesson successfully',
+    });
+});
+
+// Update User Process Status
 export const updateUserProcessStatus = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
     const { userId, unitLessonId }: { userId: string; unitLessonId: string } = req.body;
 
