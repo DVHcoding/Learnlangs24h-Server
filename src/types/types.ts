@@ -30,3 +30,17 @@ export interface UpdateUnitLessonAndVideoLectureContentType {
     totalTime: string;
     description: string;
 }
+
+export interface UpdateUnitLessonAndFillBlankExerciseType {
+    _id: string;
+    title: string;
+    time: string;
+    lesson: string;
+    questions: QuestionType[];
+}
+
+interface QuestionType {
+    sentence: string;
+    correctAnswer: string[];
+    otherAnswer: string[];
+}

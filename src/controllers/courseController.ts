@@ -25,7 +25,11 @@ import cloudinary from '../config/cloudinary.js';
 import ErrorHandler from '../utils/errorHandler.js';
 import FillBlankExercise, { Question } from '../models/fillBlankExerciseModel.js';
 import UserProcessStatus from '../models/userProcessStatusModel.js';
-import { CreateContentUnitLessonRequestType, UpdateUnitLessonAndVideoLectureContentType } from '../types/types.js';
+import {
+    CreateContentUnitLessonRequestType,
+    UpdateUnitLessonAndFillBlankExerciseType,
+    UpdateUnitLessonAndVideoLectureContentType,
+} from '../types/types.js';
 
 /* -------------------------------------------------------------------------- */
 /*                                     GET                                    */
@@ -339,6 +343,34 @@ export const updateUnitLessonAndVideoLectureContent = TryCatch(async (req: Reque
     res.status(200).json({
         success: true,
         message: 'Update Unit Lesson successfully',
+    });
+});
+
+// Update UnitLesson + FillBlankExercise
+export const updateUnitLessonAndFillBlankExercise = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    const { _id, title, time, lesson, questions }: UpdateUnitLessonAndFillBlankExerciseType = req.body;
+
+    if (!_id || !title || !time || !lesson || !questions || questions.length === 0) {
+        return next(new ErrorHandler('Please enter all fields!', 400));
+    }
+
+    // Cập nhật nội nội dung unitLesson model
+    const unitLesson = await UnitLesson.findByIdAndUpdate(_id, { title, time, lesson, createAt: Date.now() });
+    if (!unitLesson) {
+        return next(new ErrorHandler('Unit Lesson Id not found!', 404));
+    }
+    await unitLesson.save();
+
+    // Cập nhật nội dung fillBlankExercise model
+    const fillBlankExercise = await FillBlankExercise.findOneAndUpdate({ unitLesson: _id }, { questions });
+    if (!fillBlankExercise) {
+        return next(new ErrorHandler('Unit Lesson Id not found!', 404));
+    }
+    await fillBlankExercise.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'Update Unit Lesson & Fill Blank Exercise successfully',
     });
 });
 

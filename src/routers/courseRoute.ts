@@ -28,6 +28,7 @@ import {
     newLesson,
     newUnitLesson,
     newUserProcessStatus,
+    updateUnitLessonAndFillBlankExercise,
     updateUnitLessonAndVideoLectureContent,
     updateUserProcessStatus,
 } from '../controllers/courseController.js';
@@ -72,5 +73,6 @@ router.post('/newUserProcessStatus', isAuthenticated, newUserProcessStatus);
 // ########## PUT ###########
 router.put('/updateUserProcessStatus', isAuthenticated, updateUserProcessStatus);
 router.put('/updateUnitLessonAndVideoLectureContent', isAuthenticated, updateUnitLessonAndVideoLectureContent);
+router.put('/updateUnitLessonAndFillBlankExercise', isAuthenticated, updateUnitLessonAndFillBlankExercise);
 
 export default router;
