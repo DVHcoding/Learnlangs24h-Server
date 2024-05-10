@@ -21,6 +21,19 @@ export interface CreateContentUnitLessonRequestType {
     unitLesson: string;
 }
 
+export interface CreateUnitLessonAndVideoLectureContentRequestType {
+    title: string;
+    time: string;
+    icon: string;
+    lectureType: string;
+    lesson: string;
+    course: string;
+    videoUrl: string;
+    description: string;
+    totalTime: string;
+    unitLesson: string;
+}
+
 export interface UpdateUnitLessonAndVideoLectureContentType {
     _id: string;
     title: string;

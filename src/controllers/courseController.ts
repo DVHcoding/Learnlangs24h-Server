@@ -27,6 +27,7 @@ import FillBlankExercise, { Question } from '../models/fillBlankExerciseModel.js
 import UserProcessStatus from '../models/userProcessStatusModel.js';
 import {
     CreateContentUnitLessonRequestType,
+    CreateUnitLessonAndVideoLectureContentRequestType,
     UpdateUnitLessonAndFillBlankExerciseType,
     UpdateUnitLessonAndVideoLectureContentType,
 } from '../types/types.js';
@@ -237,44 +238,41 @@ export const newLesson = TryCatch(async (req: Request, res: Response, next: Next
     });
 });
 
-// Create New UnitLesson
-export const newUnitLesson = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
-    const { title, time, icon, lectureType, lesson, course } = req.body;
-
-    await UnitLesson.create({
+// Create New UnitLesson And Content
+export const newUnitLessonAndVideoLectureContent = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    const {
         title,
         time,
         icon,
         lectureType,
-        createAt: Date.now(),
         lesson,
         course,
-    });
+        videoUrl,
+        description,
+        totalTime,
+    }: CreateUnitLessonAndVideoLectureContentRequestType = req.body;
 
-    res.status(200).json({
-        success: true,
-        message: 'Create Unit Lesson successfully',
-    });
-});
-
-// Create Content for UnitLesson
-export const createContentUnitLesson = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
-    const { videoUrl, totalTime, description, unitLesson }: CreateContentUnitLessonRequestType = req.body;
-
-    if (videoUrl === '' || totalTime === '' || description === '' || unitLesson === '') {
+    if (
+        title === '' ||
+        time === '' ||
+        icon === '' ||
+        lectureType === '' ||
+        lesson === '' ||
+        course === '' ||
+        videoUrl === '' ||
+        description === ''
+    ) {
         return next(new ErrorHandler('Please enter all fields', 400));
     }
 
-    await VideoLecture.create({
-        videoUrl,
-        totalTime,
-        description,
-        unitLesson,
-    });
+    const unitLessonResponse = await UnitLesson.create({ title, time, icon, lectureType, createAt: Date.now(), lesson, course });
+    const unitLesson = unitLessonResponse._id;
+
+    await VideoLecture.create({ videoUrl, description, unitLesson, totalTime });
 
     res.status(200).json({
         success: true,
-        message: 'Create new content successfully!',
+        message: 'Create New UnitLesson successfully',
     });
 });
 

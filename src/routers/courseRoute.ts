@@ -13,7 +13,6 @@ const __dirname = path.dirname(__filename);
 // ##########################
 import { isAuthenticated } from '../middleware/auth.js';
 import {
-    createContentUnitLesson,
     getAllCourses,
     getAllLessonsByCourseId,
     getAllUnitLessonByCourseId,
@@ -26,7 +25,7 @@ import {
     newCourse,
     newFillBlankExercise,
     newLesson,
-    newUnitLesson,
+    newUnitLessonAndVideoLectureContent,
     newUserProcessStatus,
     updateUnitLessonAndFillBlankExercise,
     updateUnitLessonAndVideoLectureContent,
@@ -65,8 +64,7 @@ router.get('/unitLessonIdByUserProcess', isAuthenticated, getUnitLessonIdFromUse
 // ########## POST ###########
 router.post('/new-course', isAuthenticated, uploadConfig, newCourse);
 router.post('/new-lesson', isAuthenticated, newLesson);
-router.post('/new-unitLesson', isAuthenticated, newUnitLesson);
-router.post('/new-content-unitLesson', isAuthenticated, createContentUnitLesson);
+router.post('/newUnitLessonAndVideoLectureContent', isAuthenticated, newUnitLessonAndVideoLectureContent);
 router.post('/newFillBlankExercise', isAuthenticated, newFillBlankExercise);
 router.post('/newUserProcessStatus', isAuthenticated, newUserProcessStatus);
 
