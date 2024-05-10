@@ -14,13 +14,6 @@ export interface userDetailsType extends Request {
 
 export type ControllerType = (req: Request, res: Response, next: NextFunction) => Promise<void | Response<any, Record<string, any>>>;
 
-export interface CreateContentUnitLessonRequestType {
-    videoUrl: string;
-    totalTime: string;
-    description: string;
-    unitLesson: string;
-}
-
 export interface CreateUnitLessonAndVideoLectureContentRequestType {
     title: string;
     time: string;

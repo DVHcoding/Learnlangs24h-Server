@@ -26,7 +26,6 @@ import ErrorHandler from '../utils/errorHandler.js';
 import FillBlankExercise, { Question } from '../models/fillBlankExerciseModel.js';
 import UserProcessStatus from '../models/userProcessStatusModel.js';
 import {
-    CreateContentUnitLessonRequestType,
     CreateUnitLessonAndVideoLectureContentRequestType,
     UpdateUnitLessonAndFillBlankExerciseType,
     UpdateUnitLessonAndVideoLectureContentType,
