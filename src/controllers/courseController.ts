@@ -264,9 +264,11 @@ export const newUnitLessonAndVideoLectureContent = TryCatch(async (req: Request,
         return next(new ErrorHandler('Please enter all fields', 400));
     }
 
+    // Tạo UnitLesson trước sau đó lấy ra _id của unitLesson vừa tạo
     const unitLessonResponse = await UnitLesson.create({ title, time, icon, lectureType, createAt: Date.now(), lesson, course });
     const unitLesson = unitLessonResponse._id;
 
+    // Tạo nội dung cho unitLesson này ở VideoLecture model
     await VideoLecture.create({ videoUrl, description, unitLesson, totalTime });
 
     res.status(200).json({
