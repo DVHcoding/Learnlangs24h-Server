@@ -299,25 +299,6 @@ export const newUnitLessonAndFillBlankExercise = TryCatch(async (req: Request, r
     });
 });
 
-// Create fillBlankExercise
-export const newFillBlankExercise = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
-    const { unitLesson, questions }: { unitLesson: string; questions: Question[] } = req.body;
-
-    if (!unitLesson || !questions) {
-        return next(new ErrorHandler('Please enter all fields', 400));
-    }
-
-    await FillBlankExercise.create({
-        unitLesson,
-        questions,
-    });
-
-    res.status(200).json({
-        success: true,
-        message: 'Created a new fill-in-the-blank exercise successfully',
-    });
-});
-
 // Create New UserProcessStatus
 export const newUserProcessStatus = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
     const { userId, unitLessonId }: { userId: string; unitLessonId: string } = req.body;
