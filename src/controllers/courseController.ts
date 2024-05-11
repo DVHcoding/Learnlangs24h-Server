@@ -26,6 +26,7 @@ import ErrorHandler from '../utils/errorHandler.js';
 import FillBlankExercise, { Question } from '../models/fillBlankExerciseModel.js';
 import UserProcessStatus from '../models/userProcessStatusModel.js';
 import {
+    CreateUnitLessonAndFillBlankExerciseRequestType,
     CreateUnitLessonAndVideoLectureContentRequestType,
     UpdateUnitLessonAndFillBlankExerciseType,
     UpdateUnitLessonAndVideoLectureContentType,
@@ -237,7 +238,7 @@ export const newLesson = TryCatch(async (req: Request, res: Response, next: Next
     });
 });
 
-// Create New UnitLesson And Content
+// Create New UnitLesson And Video Lecture Content
 export const newUnitLessonAndVideoLectureContent = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
     const {
         title,
@@ -274,6 +275,27 @@ export const newUnitLessonAndVideoLectureContent = TryCatch(async (req: Request,
     res.status(200).json({
         success: true,
         message: 'Create New UnitLesson successfully',
+    });
+});
+
+// Create New UnitLesson and FillBlankExercise
+export const newUnitLessonAndFillBlankExercise = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    const { title, time, icon, lectureType, lesson, course, questions }: CreateUnitLessonAndFillBlankExerciseRequestType = req.body;
+
+    if (title === '' || time === '' || icon === '' || lectureType === '' || lesson === '' || course === '' || !questions) {
+        return next(new ErrorHandler('Please enter all fields', 400));
+    }
+
+    // Tạo UnitLesson trước sau đó lấy ra _id của unitLesson vừa tạo
+    const unitLessonResponse = await UnitLesson.create({ title, time, icon, lectureType, createAt: Date.now(), lesson, course });
+    const unitLesson = unitLessonResponse._id;
+
+    // Tạo nội dung cho unitLesson này ở FillBlankExercise model
+    await FillBlankExercise.create({ unitLesson, questions });
+
+    res.status(200).json({
+        success: true,
+        message: 'Create new UnitLesson successfully',
     });
 });
 

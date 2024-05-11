@@ -25,6 +25,7 @@ import {
     newCourse,
     newFillBlankExercise,
     newLesson,
+    newUnitLessonAndFillBlankExercise,
     newUnitLessonAndVideoLectureContent,
     newUserProcessStatus,
     updateUnitLessonAndFillBlankExercise,
@@ -65,6 +66,7 @@ router.get('/unitLessonIdByUserProcess', isAuthenticated, getUnitLessonIdFromUse
 router.post('/new-course', isAuthenticated, uploadConfig, newCourse);
 router.post('/new-lesson', isAuthenticated, newLesson);
 router.post('/newUnitLessonAndVideoLectureContent', isAuthenticated, newUnitLessonAndVideoLectureContent);
+router.post('/newUnitLessonAndFillBlankExercise', isAuthenticated, newUnitLessonAndFillBlankExercise);
 router.post('/newFillBlankExercise', isAuthenticated, newFillBlankExercise);
 router.post('/newUserProcessStatus', isAuthenticated, newUserProcessStatus);
 
