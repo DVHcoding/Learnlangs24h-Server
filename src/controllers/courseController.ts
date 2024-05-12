@@ -403,11 +403,7 @@ export const updateUserProcessStatus = TryCatch(async (req: Request, res: Respon
 /* -------------------------------------------------------------------------- */
 // # Delete UnitLesson And VideoLectureContent
 export const deleteUnitLessonAndVideoLectureContent = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
-    const { unitId }: { unitId: string } = req.body;
-
-    if (!unitId) {
-        return next(new ErrorHandler('unitLesson not found!', 404));
-    }
+    const unitId = req.query.unitId as string;
 
     // Xóa unitLesson trước
     const unitLesson = await UnitLesson.findByIdAndDelete({ _id: unitId });
@@ -431,7 +427,7 @@ export const deleteUnitLessonAndVideoLectureContent = TryCatch(async (req: Reque
 
 // # Delete UnitLesson And FillBlankExercise
 export const deleteUnitLessonAndFillBLankExercise = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
-    const { unitId }: { unitId: string } = req.body;
+    const unitId = req.query.unitId as string;
 
     if (!unitId) {
         return next(new ErrorHandler('unitLesson not found!', 404));
