@@ -401,6 +401,7 @@ export const updateUserProcessStatus = TryCatch(async (req: Request, res: Respon
 /* -------------------------------------------------------------------------- */
 /*                                   DELETE                                   */
 /* -------------------------------------------------------------------------- */
+// # Delete UnitLesson And VideoLectureContent
 export const deleteUnitLessonAndVideoLectureContent = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
     const { unitId }: { unitId: string } = req.body;
 
@@ -416,11 +417,38 @@ export const deleteUnitLessonAndVideoLectureContent = TryCatch(async (req: Reque
     }
 
     // Xóa videoLectureContent
-
     const videoLecture = await VideoLecture.deleteOne({ unitLesson: unitId });
 
     if (!videoLecture) {
         return next(new ErrorHandler('VideoLectureContent not found!', 404));
+    }
+
+    res.status(200).json({
+        success: true,
+        message: 'Deleted unitLesson successfully',
+    });
+});
+
+// # Delete UnitLesson And FillBlankExercise
+export const deleteUnitLessonAndFillBLankExercise = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    const { unitId }: { unitId: string } = req.body;
+
+    if (!unitId) {
+        return next(new ErrorHandler('unitLesson not found!', 404));
+    }
+
+    // Xóa unitLesson trước
+    const unitLesson = await UnitLesson.findByIdAndDelete({ _id: unitId });
+
+    if (!unitLesson) {
+        return next(new ErrorHandler('Unit lesson not found!', 404));
+    }
+
+    // Xóa fillBlankExercise
+    const fillBlankExercise = await FillBlankExercise.deleteOne({ unitLesson: unitId });
+
+    if (!fillBlankExercise) {
+        return next(new ErrorHandler('FillBlankExercise not found!', 404));
     }
 
     res.status(200).json({
