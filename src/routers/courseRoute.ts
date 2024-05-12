@@ -13,6 +13,7 @@ const __dirname = path.dirname(__filename);
 // ##########################
 import { isAuthenticated } from '../middleware/auth.js';
 import {
+    deleteUnitLessonAndVideoLectureContent,
     getAllCourses,
     getAllLessonsByCourseId,
     getAllUnitLessonByCourseId,
@@ -72,5 +73,8 @@ router.post('/newUserProcessStatus', isAuthenticated, newUserProcessStatus);
 router.put('/updateUserProcessStatus', isAuthenticated, updateUserProcessStatus);
 router.put('/updateUnitLessonAndVideoLectureContent', isAuthenticated, updateUnitLessonAndVideoLectureContent);
 router.put('/updateUnitLessonAndFillBlankExercise', isAuthenticated, updateUnitLessonAndFillBlankExercise);
+
+// ########## DELETE ###########
+router.delete('/deleteUnitLessonAndVideoLectureContent', deleteUnitLessonAndVideoLectureContent);
 
 export default router;

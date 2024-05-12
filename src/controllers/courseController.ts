@@ -397,3 +397,34 @@ export const updateUserProcessStatus = TryCatch(async (req: Request, res: Respon
         message: 'update status successfully!',
     });
 });
+
+/* -------------------------------------------------------------------------- */
+/*                                   DELETE                                   */
+/* -------------------------------------------------------------------------- */
+export const deleteUnitLessonAndVideoLectureContent = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    const { unitId }: { unitId: string } = req.body;
+
+    if (!unitId) {
+        return next(new ErrorHandler('unitLesson not found!', 404));
+    }
+
+    // Xóa unitLesson trước
+    const unitLesson = await UnitLesson.findByIdAndDelete({ _id: unitId });
+
+    if (!unitLesson) {
+        return next(new ErrorHandler('Unit lesson not found!', 404));
+    }
+
+    // Xóa videoLectureContent
+
+    const videoLecture = await VideoLecture.deleteOne({ unitLesson: unitId });
+
+    if (!videoLecture) {
+        return next(new ErrorHandler('VideoLectureContent not found!', 404));
+    }
+
+    res.status(200).json({
+        success: true,
+        message: 'Deleted unitLesson successfully',
+    });
+});
