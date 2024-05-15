@@ -56,12 +56,15 @@ export const loginUser = TryCatch(async (req: Request, res: Response, next: Next
     // Tìm tài khoản trong mongodb bằng email (không gửi refreshToken)
     const user = await Users.findOne({ email }).select('+password -refreshToken'); // Phải thêm +password mới đem so sánh đc;
 
+    // Nếu không tìm thấy thì trả về lỗi (status: 401);
     if (!user) {
         return next(new ErrorHandler('Invalid Email or Password', 401));
     }
 
+    // Kiểm tra password người dùng nhập có chính xác không
     const isPasswordMatched = await user.comparePassword(password);
 
+    // Nếu không chính xác trả về status lỗi 401
     if (!isPasswordMatched) {
         return next(new ErrorHandler('Invalid Email or Password', 401));
     }
