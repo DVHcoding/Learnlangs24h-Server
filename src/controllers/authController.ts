@@ -27,10 +27,12 @@ type UserRequestType = {
 export const registerUser = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
     const { username, email, password, photo }: UserRequestType = req.body;
 
+    // Nếu đăng kí thiếu trường username, email hoặc password thì trả về lỗi 400
     if (!username || !email || !password) {
         return next(new ErrorHandler('Please add all fields', 400));
     }
 
+    // Tạo documents mới vào bảng users với các thông tin người dùng nhập
     const user = await Users.create({
         username,
         email,
@@ -41,6 +43,7 @@ export const registerUser = TryCatch(async (req: Request, res: Response, next: N
         },
     });
 
+    // gọi hàm tạo token();
     sendToken(user, 200, res);
 });
 
