@@ -102,6 +102,7 @@ export const loginGoogle = TryCatch(
 export const logoutUser = TryCatch(async (req: Request, res: Response) => {
   const cookiesToClear = ["token", "refresh_token", "googleId"];
 
+  // Xóa hết cookies nếu người dùng đăng xuất 
   cookiesToClear.forEach((cookieName) => {
     res.clearCookie(cookieName, {
       httpOnly: true,
