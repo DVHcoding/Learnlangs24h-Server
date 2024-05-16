@@ -42,6 +42,7 @@ export const sendToken = async (user: UserDocument, statusCode: number, res: Res
         });
 };
 
+// Hàm tạo token cho google
 export const sendGoogleToken = async (user: UserDocument, statusCode: number, res: Response) => {
     const token = user.googleId;
 
@@ -53,6 +54,7 @@ export const sendGoogleToken = async (user: UserDocument, statusCode: number, re
         secure: true,
     };
 
+    // Trả về dữ liệu cho client và tạo một cookie có tên là googleId
     res.status(statusCode)
         .cookie('googleId', token, options)
         .json({
