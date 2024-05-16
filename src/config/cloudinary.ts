@@ -1,10 +1,10 @@
-import { v2 as cloudinary } from "cloudinary";
+import { v2 as cloudinary } from 'cloudinary';
 
 // Cloudinary
 cloudinary.config({
-  cloud_name: "dvwdfsdkp",
-  api_key: "813336556963634",
-  api_secret: "tBgA6e2eZ2iO6RYAlVLDmWJey5Q",
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.CLOUD_API_KEY,
+    api_secret: process.env.CLOUD_API_SECRET,
 });
 
 export default cloudinary;
