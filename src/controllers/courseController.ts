@@ -443,6 +443,7 @@ export const deleteUnitLessonAndFillBLankExercise = TryCatch(async (req: Request
     // Xóa fillBlankExercise
     const fillBlankExercise = await FillBlankExercise.deleteOne({ unitLesson: unitId });
 
+    // Nếu không xóa được chứng tỏ unitLessonId không có trong database
     if (!fillBlankExercise) {
         return next(new ErrorHandler('FillBlankExercise not found!', 404));
     }
