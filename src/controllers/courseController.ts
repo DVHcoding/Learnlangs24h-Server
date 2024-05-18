@@ -398,6 +398,32 @@ export const updateUserProcessStatus = TryCatch(async (req: Request, res: Respon
     });
 });
 
+// Update Lesson Name
+export const updateLesson = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    const { lessonId, lessonName }: { lessonId: string; lessonName: string } = req.body;
+
+    // Nếu không có lessonId hoặc lessonName thì trả về lỗi 400 với message
+    if (!lessonId || !lessonName) {
+        return next(new ErrorHandler('Please Enter all fields!', 400));
+    }
+
+    // Tìm kiếm lesson có id tương ứng và update name
+    const lesson = await Lesson.findByIdAndUpdate(lessonId, { name: lessonName });
+
+    // Nếu không tìm được thì response về lỗi 404
+    if (!lesson) {
+        return next(new ErrorHandler('LessonId not found!', 404));
+    }
+
+    // Lưu lại
+    await lesson.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'Update lesson successfully',
+    });
+});
+
 /* -------------------------------------------------------------------------- */
 /*                                   DELETE                                   */
 /* -------------------------------------------------------------------------- */
