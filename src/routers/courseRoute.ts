@@ -29,6 +29,7 @@ import {
     newUnitLessonAndFillBlankExercise,
     newUnitLessonAndVideoLectureContent,
     newUserProcessStatus,
+    updateLesson,
     updateUnitLessonAndFillBlankExercise,
     updateUnitLessonAndVideoLectureContent,
     updateUserProcessStatus,
@@ -74,6 +75,7 @@ router.post('/newUserProcessStatus', isAuthenticated, newUserProcessStatus);
 router.put('/updateUserProcessStatus', isAuthenticated, updateUserProcessStatus);
 router.put('/updateUnitLessonAndVideoLectureContent', isAuthenticated, updateUnitLessonAndVideoLectureContent);
 router.put('/updateUnitLessonAndFillBlankExercise', isAuthenticated, updateUnitLessonAndFillBlankExercise);
+router.put('/updateLesson', isAuthenticated, updateLesson);
 
 // ########## DELETE ###########
 router.delete('/deleteUnitLessonAndVideoLectureContent', isAuthenticated, deleteUnitLessonAndVideoLectureContent);
