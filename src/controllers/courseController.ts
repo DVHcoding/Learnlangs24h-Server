@@ -485,6 +485,10 @@ export const deleteLessonAndUnitLesson = TryCatch(async (req: Request, res: Resp
     const lessonId = req.query.lessonId as string;
     const unitLessonId = req.query.unitLessonId as string;
 
+    if (!lessonId || unitLessonId) {
+        return next(new ErrorHandler('LessonId or unitLessonId cannot be left blank', 400));
+    }
+
     res.status(200).json({
         success: true,
         message: 'Delete lesson and unitLesson successfully',
