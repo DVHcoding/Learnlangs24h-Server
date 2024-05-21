@@ -482,6 +482,9 @@ export const deleteUnitLessonAndFillBLankExercise = TryCatch(async (req: Request
 
 // # Delete Lesson And UnitLesson
 export const deleteLessonAndUnitLesson = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    const lessonId = req.query.lessonId as string;
+    const unitLessonId = req.query.unitLessonId as string;
+
     res.status(200).json({
         success: true,
         message: 'Delete lesson and unitLesson successfully',
