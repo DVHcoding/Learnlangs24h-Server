@@ -482,9 +482,11 @@ export const deleteUnitLessonAndFillBLankExercise = TryCatch(async (req: Request
 
 // # Delete Lesson And UnitLesson
 export const deleteLessonAndUnitLesson = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    // Lấy lessonId và unitLesson Id từ thanh URL (tức query);
     const lessonId = req.query.lessonId as string;
     const unitLessonId = req.query.unitLessonId as string;
 
+    // Nếu không có 2 trường này trong URL thì trả về lỗi 400
     if (!lessonId || unitLessonId) {
         return next(new ErrorHandler('LessonId or unitLessonId cannot be left blank', 400));
     }
