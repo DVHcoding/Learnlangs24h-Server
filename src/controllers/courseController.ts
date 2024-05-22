@@ -72,8 +72,10 @@ export const getAllLessonsByCourseId = TryCatch(async (req: Request, res: Respon
 
 // Get All Unit Lessons By CourseID
 export const getAllUnitLessonByCourseId = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    // tìm tất cả unitLessons có courseId lấy từ thanh URL
     const unitLessons = await UnitLesson.find({ course: req.params.id });
 
+    // Nếu không có thì trả về statusCode 404 (NotFound)
     if (!unitLessons || unitLessons.length === 0) {
         return next(new ErrorHandler('unitLessons not found!', 404));
     }
