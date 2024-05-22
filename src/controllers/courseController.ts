@@ -127,10 +127,12 @@ export const getUnitLessonById = TryCatch(async (req: Request, res: Response, ne
 
 // Get Video Lecture By Unit Lesson Id
 export const getVideoLectureContent = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    // tìm videoLecture có unitLessonId lấy từ URL
     const videoLectureContent = await VideoLecture.findOne({
         unitLesson: req.params.id,
     });
 
+    // Nếu không có thì trả về statusCode 404 (NotFound)
     if (!videoLectureContent) {
         return next(new ErrorHandler('Video Lecture content not found!', 404));
     }
