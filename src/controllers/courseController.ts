@@ -56,8 +56,10 @@ export const getAllCourses = TryCatch(async (req: Request, res: Response, next: 
 
 // Get All Lessons By Id
 export const getAllLessonsByCourseId = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    // Lấy tất cả lesson có course id lấy từ thanh URL (req.params.id)
     const lessons = await Lesson.find({ course: req.params.id });
 
+    // Nếu không có lesson thì trả về status code 404 (NotFound)
     if (!lessons || lessons.length === 0 || lessons == null) {
         return next(new ErrorHandler('Lessons is not found', 404));
     }
