@@ -39,9 +39,11 @@ import {
 export const getAllCourses = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
     let courses: CourseType[];
 
+    // Nếu khóa học đã tồn tại trong cache thì lấy ra dùng
     if (nodeCache.has('courses')) {
         courses = JSON.parse(nodeCache.get<string | any>('courses'));
     } else {
+        // Nếu chưa có thì lấy từ database
         courses = await Course.find();
         nodeCache.set('courses', JSON.stringify(courses));
     }
