@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 import NodeCache from 'node-cache';
 
 const nodeCache = new NodeCache({
-    stdTTL: 3600,
+    stdTTL: 3600, // 3600 giây.
 });
 
 // ##########################
