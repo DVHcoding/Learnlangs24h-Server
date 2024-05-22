@@ -93,10 +93,12 @@ export const getAllUnitLessonByLessonId = TryCatch(async (req: Request, res: Res
         return next(new ErrorHandler('Params not found', 400));
     }
 
+    // Tìm tất cả unitLessons có lessonId lấy từ URL
     const unitLessons = await UnitLesson.find({
         lesson: req.params.id,
     });
 
+    // Nếu không có thì trả về status 404 (NotFound)
     if (!unitLessons || unitLessons.length === 0) {
         return next(new ErrorHandler('Unit Lessons not found', 404));
     }
