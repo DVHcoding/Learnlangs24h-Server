@@ -510,6 +510,14 @@ export const deleteLessonAndUnitLesson = TryCatch(async (req: Request, res: Resp
         return next(new ErrorHandler('UnitLesson not found', 404));
     }
 
+    // Xóa lesson với lessonId lấy từ URL
+    const lesson = await Lesson.findByIdAndDelete(lessonId);
+
+    // Nếu không tìm thấy thì trả về status 404
+    if (!lesson) {
+        return next(new ErrorHandler('Lesson not found', 404));
+    }
+
     res.status(200).json({
         success: true,
         message: 'Delete lesson and unitLesson successfully',
