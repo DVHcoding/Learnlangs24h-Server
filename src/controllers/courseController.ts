@@ -502,12 +502,12 @@ export const deleteLessonAndUnitLesson = TryCatch(async (req: Request, res: Resp
         return next(new ErrorHandler('LessonId or unitLessonId cannot be left blank', 400));
     }
 
-    // Tìm unitLesson có lessonId lấy từ Url thì xóa đi
-    const unitLesson = await UnitLesson.findByIdAndDelete({ lesson: lessonId });
+    // Xóa tất cả các unitLesson có lessonId tương ứng
+    const deleteUnitLessonResult = await UnitLesson.deleteMany({ lesson: lessonId });
 
-    // Nếu không tìm thầy unitLesson nào thì trả về lỗi 404
-    if (!unitLesson) {
-        return next(new ErrorHandler('UnitLesson not found', 404));
+    // Kiểm tra xem có bản ghi nào bị xóa không
+    if (deleteUnitLessonResult.deletedCount === 0) {
+        return next(new ErrorHandler('No unitLesson found for the given lessonId', 404));
     }
 
     // Xóa lesson với lessonId lấy từ URL
