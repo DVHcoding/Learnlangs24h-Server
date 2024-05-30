@@ -11,18 +11,7 @@ import { TryCatch } from '../middleware/error.js';
 import ErrorHandler from '../utils/errorHandler.js';
 import { sendGoogleToken, sendToken } from '../utils/jwtToken.js';
 import { removeVietnameseTones } from '../utils/regexVietnamese.js';
-
-// ##########################
-type UserRequestType = {
-    username: string;
-    email: string;
-    password?: string;
-    photo: {
-        public_id: string;
-        url: string;
-    };
-    googleId?: string;
-};
+import { UserRequestType } from '../types/types.js';
 
 // RegisterUser Controller
 export const registerUser = TryCatch(async (req: Request, res: Response, next: NextFunction) => {

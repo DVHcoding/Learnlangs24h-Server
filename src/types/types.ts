@@ -59,3 +59,15 @@ interface QuestionType {
     correctAnswer: string[];
     otherAnswer: string[];
 }
+
+// ##########################
+export interface UserRequestType {
+    username: string;
+    email: string;
+    password?: string;
+    photo: {
+        public_id: string;
+        url: string;
+    };
+    googleId?: string;
+}
