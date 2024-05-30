@@ -102,6 +102,7 @@ export const loginGoogle = TryCatch(async (req: Request, res: Response, next: Ne
     if (!user) {
         // Lấy thời gian hiện tại tính bằng mili giây
         const milliseconds = new Date().getTime();
+        // Chuyển giá trị mili giây thành chuỗi và lấy 4 chữ số cuối cùng
         const lastFourDigits = milliseconds.toString().slice(-4);
 
         // Loại bỏ ký tự việt nam và dấu cách khỏi username và thêm 4 số đằng sau
