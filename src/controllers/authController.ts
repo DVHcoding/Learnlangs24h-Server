@@ -10,6 +10,7 @@ import Users from '../models/userModel.js';
 import { TryCatch } from '../middleware/error.js';
 import ErrorHandler from '../utils/errorHandler.js';
 import { sendGoogleToken, sendToken } from '../utils/jwtToken.js';
+import { removeVietnameseTones } from '../utils/regexVietnamese.js';
 
 // ##########################
 type UserRequestType = {
@@ -28,12 +29,26 @@ export const registerUser = TryCatch(async (req: Request, res: Response, next: N
     const { username, email, password, photo }: UserRequestType = req.body;
 
     // Nếu đăng kí thiếu trường username, email hoặc password thì trả về lỗi 400
-    if (!username || !email || !password) {
+    if (!username || !email || !password || username === '' || email === '' || password === '') {
         return next(new ErrorHandler('Please add all fields', 400));
+    }
+
+    const milliseconds = new Date().getTime();
+    const lastFourDigits = milliseconds.toString().slice(-4);
+
+    // Loại bỏ ký tự việt nam và dấu cách khỏi username và thêm 4 số đằng sau
+    const nickname: string = `${removeVietnameseTones(username.split('').join(''))}${lastFourDigits}`;
+
+    // Kiểm tra trùng lặp nickname
+    const existingUser = await Users.findOne({ nickname });
+
+    if (existingUser) {
+        return next(new ErrorHandler('Nickname đã tồn tại vui lòng thử lại!', 400));
     }
 
     // Tạo documents mới vào bảng users với các thông tin người dùng nhập
     const user = await Users.create({
+        nickname,
         username,
         email,
         password,
