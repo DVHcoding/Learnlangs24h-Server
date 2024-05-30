@@ -33,6 +33,7 @@ export const registerUser = TryCatch(async (req: Request, res: Response, next: N
         return next(new ErrorHandler('Please add all fields', 400));
     }
 
+    // Lấy thời gian hiện tại tính bằng mili giây
     const milliseconds = new Date().getTime();
     const lastFourDigits = milliseconds.toString().slice(-4);
 
