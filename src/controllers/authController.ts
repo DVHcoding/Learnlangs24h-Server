@@ -100,6 +100,7 @@ export const loginGoogle = TryCatch(async (req: Request, res: Response, next: Ne
     const user = await Users.findOne({ googleId });
 
     if (!user) {
+        // Lấy thời gian hiện tại tính bằng mili giây
         const milliseconds = new Date().getTime();
         const lastFourDigits = milliseconds.toString().slice(-4);
 
