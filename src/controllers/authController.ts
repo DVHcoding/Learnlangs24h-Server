@@ -97,7 +97,21 @@ export const loginGoogle = TryCatch(async (req: Request, res: Response, next: Ne
     const user = await Users.findOne({ googleId });
 
     if (!user) {
+        const milliseconds = new Date().getTime();
+        const lastFourDigits = milliseconds.toString().slice(-4);
+
+        // Loại bỏ ký tự việt nam và dấu cách khỏi username và thêm 4 số đằng sau
+        const nickname: string = `${removeVietnameseTones(username.split('').join(''))}${lastFourDigits}`;
+
+        // Kiểm tra trùng lặp nickname
+        const existingUser = await Users.findOne({ nickname });
+
+        if (existingUser) {
+            return next(new ErrorHandler('Nickname đã tồn tại vui lòng thử lại!', 400));
+        }
+
         const userGoogle = await Users.create({
+            nickname,
             username,
             email,
             photo: {
