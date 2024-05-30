@@ -502,20 +502,20 @@ export const deleteLessonAndUnitLesson = TryCatch(async (req: Request, res: Resp
         return next(new ErrorHandler('LessonId or unitLessonId cannot be left blank', 400));
     }
 
-    // Xóa tất cả các unitLesson có lessonId tương ứng
-    const deleteUnitLessonResult = await UnitLesson.deleteMany({ lesson: lessonId });
-
-    // Kiểm tra xem có bản ghi nào bị xóa không
-    if (deleteUnitLessonResult.deletedCount === 0) {
-        return next(new ErrorHandler('No unitLesson found for the given lessonId', 404));
-    }
-
     // Xóa lesson với lessonId lấy từ URL
     const lesson = await Lesson.findByIdAndDelete(lessonId);
 
     // Nếu không tìm thấy thì trả về status 404
     if (!lesson) {
         return next(new ErrorHandler('Lesson not found', 404));
+    }
+
+    // Xóa tất cả các unitLesson có lessonId tương ứng
+    const deleteUnitLessonResult = await UnitLesson.deleteMany({ lesson: lessonId });
+
+    // Kiểm tra xem có bản ghi nào bị xóa không
+    if (deleteUnitLessonResult.deletedCount === 0) {
+        return next(new ErrorHandler('No unitLesson found for the given lessonId', 404));
     }
 
     res.status(200).json({
