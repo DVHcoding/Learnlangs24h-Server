@@ -1,23 +1,40 @@
 // ##########################
 // #      IMPORT NPM        #
 // ##########################
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from 'express';
 
 // ##########################
 // #    IMPORT Components   #
 // ##########################
-import Users from "../models/userModel.js";
-import { TryCatch } from "../middleware/error.js";
-import { userDetailsType } from "../types/types.js";
+import Users from '../models/userModel.js';
+import { TryCatch } from '../middleware/error.js';
+import { userDetailsType } from '../types/types.js';
+import ErrorHandler from '../utils/errorHandler.js';
+
+/* -------------------------------------------------------------------------- */
+/*                                     GET                                    */
+/* -------------------------------------------------------------------------- */
 
 // Get Details User Controller
-export const detailsUser = TryCatch(
-  async (req: Request & { user?: userDetailsType["user"] }, res: Response) => {
+export const detailsUser = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response) => {
     const user = await Users.findById(req.user?.id);
 
     res.status(200).json({
-      success: true,
-      user,
+        success: true,
+        user,
     });
-  }
-);
+});
+
+// Get User Detail for nickname
+export const userDetailsByNickName = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    const findUserDetailsByNickName = await Users.findOne({ nickname: req.params.nickname }).select('-googleId');
+
+    if (!findUserDetailsByNickName) {
+        return next(new ErrorHandler('User not found!', 404));
+    }
+
+    res.status(200).json({
+        success: true,
+        user: findUserDetailsByNickName,
+    });
+});
