@@ -27,6 +27,8 @@ export const detailsUser = TryCatch(async (req: Request & { user?: userDetailsTy
 
 // Get User Detail for nickname
 export const userDetailsByNickName = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    // Tìm user có nickname lấy từ thanh URL (example: hhttp://localhost:5173/profile/HungDo3481)
+    // và không lấy trường googleId
     const findUserDetailsByNickName = await Users.findOne({ nickname: req.params.nickname }).select('-googleId');
 
     if (!findUserDetailsByNickName) {
