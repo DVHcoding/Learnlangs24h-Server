@@ -17,7 +17,7 @@ import ErrorHandler from '../utils/errorHandler.js';
 
 // Get Details User Controller
 export const detailsUser = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response) => {
-    const user = await Users.findById(req.user?.id);
+    const user = await Users.findById(req.user?.id).select('-googleId');
 
     res.status(200).json({
         success: true,
