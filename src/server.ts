@@ -32,12 +32,17 @@ const io = new Server(server, {
     },
 });
 
+const userSocketIDs = new Map();
+
 // Lắng nghe sự kiện kết nối từ client
 io.on('connection', (socket) => {
     const user = {
         _id: 'abcid01',
         name: 'hung',
     };
+
+    userSocketIDs.set(user._id, socket.id);
+    console.log(userSocketIDs);
 
     // Lắng nghe sự kiện NEW_MESSAGE
     socket.on(NEW_MESSAGE, async ({ chatId, members, messages }) => {
