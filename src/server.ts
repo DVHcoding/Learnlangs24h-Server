@@ -14,6 +14,7 @@ dotenv.config();
 import app from './app.js';
 import connectDatabase from './config/database.js';
 import { NEW_MESSAGE } from './constants/events.js';
+import { getSockets } from './utils/helper.js';
 
 ///////////////////////////////////////////////////////////
 // Lấy số lượng CPU của hệ thống
@@ -32,7 +33,7 @@ const io = new Server(server, {
     },
 });
 
-const userSocketIDs = new Map();
+export const userSocketIDs = new Map();
 
 // Lắng nghe sự kiện kết nối từ client
 io.on('connection', (socket) => {
@@ -41,13 +42,13 @@ io.on('connection', (socket) => {
         name: 'hung',
     };
 
-    userSocketIDs.set(user._id, socket.id);
+    userSocketIDs.set(user._id.toString(), socket.id);
     console.log(userSocketIDs);
 
     // Lắng nghe sự kiện NEW_MESSAGE
-    socket.on(NEW_MESSAGE, async ({ chatId, members, messages }) => {
+    socket.on(NEW_MESSAGE, async ({ chatId, members, message }: { chatId: string; members: [{ _id: string }]; message: string }) => {
         const messageForRealTime = {
-            content: messages,
+            content: message,
             _id: uuid(),
             sender: {
                 _id: user._id,
@@ -56,6 +57,19 @@ io.on('connection', (socket) => {
             chat: chatId,
             createdAt: new Date().toISOString(),
         };
+
+        const messageForDB = {
+            content: message,
+            sender: user._id,
+            chat: chatId,
+        };
+
+        const membersSocket = getSockets(members);
+
+        io.to(membersSocket).emit(NEW_MESSAGE, {
+            chatId,
+            message: messageForRealTime,
+        });
 
         console.log('New message', messageForRealTime);
     });
