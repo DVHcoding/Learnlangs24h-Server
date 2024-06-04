@@ -32,14 +32,7 @@ const io = new Server(server, {
 
 // Lắng nghe sự kiện kết nối từ client
 io.on('connection', (socket) => {
-    console.log('New client connected');
-
-    // Xử lý các sự kiện từ client
-    socket.on('message', (data) => {
-        console.log('Message received:', data);
-        // Phát lại dữ liệu tới tất cả các client
-        io.emit('message', data);
-    });
+ 
 
     // Xử lý sự kiện ngắt kết nối
     socket.on('disconnect', () => {
