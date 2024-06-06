@@ -161,6 +161,7 @@ export const getFillBlankExercise = TryCatch(async (req: Request, res: Response,
 
 // Get UserProcessStatus
 export const getUserProcessStatus = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    // Sử dụng populate để lấy chi tiết hơn cho trường unitLessonId thay vì chỉ mỗi ObjectId
     const unitLessonStatus = await UserProcessStatus.find({
         userId: req.params.id,
     }).populate('unitLessonId');
