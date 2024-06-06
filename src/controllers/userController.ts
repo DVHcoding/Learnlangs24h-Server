@@ -15,7 +15,7 @@ import ErrorHandler from '../utils/errorHandler.js';
 /*                                     GET                                    */
 /* -------------------------------------------------------------------------- */
 
-// Get Details User Controller
+// Xem chi tiết thông tin user
 export const userDetails = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response) => {
     const user = await Users.findById(req.user?.id).select('-googleId');
 
@@ -25,7 +25,7 @@ export const userDetails = TryCatch(async (req: Request & { user?: userDetailsTy
     });
 });
 
-// Get User Detail for nickname
+// Xem Chi tiết thông tin user bằng nickname
 export const userDetailsByNickName = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
     // Tìm user có nickname lấy từ thanh URL (example: hhttp://localhost:5173/profile/HungDo3481)
     // và không lấy trường googleId
@@ -41,3 +41,7 @@ export const userDetailsByNickName = TryCatch(async (req: Request, res: Response
         user: findUserDetailsByNickName,
     });
 });
+
+/* -------------------------------------------------------------------------- */
+/*                                    POST                                    */
+/* -------------------------------------------------------------------------- */
