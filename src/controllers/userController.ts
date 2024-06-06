@@ -14,7 +14,6 @@ import ErrorHandler from '../utils/errorHandler.js';
 /* -------------------------------------------------------------------------- */
 /*                                     GET                                    */
 /* -------------------------------------------------------------------------- */
-
 // Xem chi tiết thông tin user
 export const userDetails = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response) => {
     const user = await Users.findById(req.user?.id).select('-googleId');
@@ -45,3 +44,33 @@ export const userDetailsByNickName = TryCatch(async (req: Request, res: Response
 /* -------------------------------------------------------------------------- */
 /*                                    POST                                    */
 /* -------------------------------------------------------------------------- */
+
+export const followUser = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
+    const { userId }: { userId: string } = req.body;
+
+    const user = await Users.findById(req.user?.id);
+    const userToFollow = await Users.findById(userId);
+
+    if (!user) {
+        return next(new ErrorHandler('User not found!', 404));
+    }
+
+    if (!userToFollow) {
+        return next(new ErrorHandler('User not found!', 404));
+    }
+
+    if (user?.followers.includes(userToFollow._id)) {
+        return next(new ErrorHandler('You are already following this user', 400));
+    }
+
+    user?.following.push(userToFollow._id);
+    userToFollow?.followers.push(user._id);
+
+    await user.save();
+    await userToFollow.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'User followed successfully',
+    });
+});
