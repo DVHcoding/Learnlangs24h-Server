@@ -23,6 +23,8 @@ export interface UserType extends mongoose.Document {
     followers: mongoose.Types.ObjectId[];
     following: mongoose.Types.ObjectId[];
     friends: mongoose.Types.ObjectId[];
+    level: number;
+
     resetPasswordCode: string;
     resetPasswordExpire: Date;
     refreshToken: string;
@@ -98,6 +100,10 @@ const userSchema = new Schema({
             ref: 'Users',
         },
     ],
+    level: {
+        type: Number,
+        default: 1,
+    },
     resetPasswordCode: String,
     resetPasswordExpire: Date,
 });
