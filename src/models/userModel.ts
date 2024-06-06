@@ -20,6 +20,9 @@ export interface UserType extends mongoose.Document {
     createdAt: Date;
     roles: string;
     googleId: string;
+    followers: mongoose.Types.ObjectId[];
+    following: mongoose.Types.ObjectId[];
+    friends: mongoose.Types.ObjectId[];
     resetPasswordCode: string;
     resetPasswordExpire: Date;
     refreshToken: string;
@@ -77,6 +80,24 @@ const userSchema = new Schema({
         type: String,
         select: false,
     },
+    followers: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Users',
+        },
+    ],
+    following: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Users',
+        },
+    ],
+    friends: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Users',
+        },
+    ],
     resetPasswordCode: String,
     resetPasswordExpire: Date,
 });
