@@ -87,7 +87,13 @@ export const unFollow = TryCatch(async (req: Request & { user?: userDetailsType[
     const resultUnFollow = await Users.updateOne({ _id: req.user?.id }, { $pull: { following: userId } });
 
     if (resultUnFollow.modifiedCount === 0) {
-        return next(new ErrorHandler('Failed to unfollow user or user was not being followed', 400));
+        return next(new ErrorHandler('Hủy follow thất bại. Vui lòng thử lại sau!', 400));
+    }
+
+    const resultRemoveFollower = await Users.updateOne({ _id: userId }, { $pull: { followers: req.user?.id } });
+
+    if (resultRemoveFollower.modifiedCount === 0) {
+        return next(new ErrorHandler('Có lỗi xảy ra vui lòng thử lại!', 400));
     }
 
     res.status(200).json({
