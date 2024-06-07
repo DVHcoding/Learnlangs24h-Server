@@ -7,7 +7,7 @@ import express, { Router } from 'express';
 // #    IMPORT Components   #
 // ##########################
 import { isAuthenticated } from '../middleware/auth.js';
-import { followUser, unFollow, userDetails, userDetailsByNickName } from '../controllers/userController.js';
+import { addFriend, followUser, unFollow, unFriend, userDetails, userDetailsByNickName } from '../controllers/userController.js';
 
 // ##########################
 const router: Router = express.Router();
@@ -23,5 +23,7 @@ router.get('/profile/:nickname', userDetailsByNickName);
 /* -------------------------------------------------------------------------- */
 router.post('/followUser', isAuthenticated, followUser);
 router.post('/unFollow', isAuthenticated, unFollow);
+router.post('/addFriend', isAuthenticated, addFriend);
+router.post('/unFriend', isAuthenticated, unFriend);
 
 export default router;

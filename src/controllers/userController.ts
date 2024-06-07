@@ -2,6 +2,7 @@
 // #      IMPORT NPM        #
 // ##########################
 import { NextFunction, Request, Response } from 'express';
+import { Types } from 'mongoose';
 
 // ##########################
 // #    IMPORT Components   #
@@ -45,31 +46,25 @@ export const userDetailsByNickName = TryCatch(async (req: Request, res: Response
 /*                                    POST                                    */
 /* -------------------------------------------------------------------------- */
 
-export const followUser = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
+export const followUser = TryCatch(async (req: Request & { user?: { id: string } }, res: Response, next: NextFunction) => {
     const { userId }: { userId: string } = req.body;
 
-    const user = await Users.findById(req.user?.id);
-    const userToFollow = await Users.findById(userId);
-
-    if (!user) {
-        return next(new ErrorHandler('User not found!', 404));
+    if (!userId) {
+        return next(new ErrorHandler('Please provide userId', 400));
     }
 
-    if (!userToFollow) {
-        return next(new ErrorHandler('User not found!', 404));
+    const userObjectId = new Types.ObjectId(req.user?.id);
+    const userToFollowObjectId = new Types.ObjectId(userId);
+
+    // Kiểm tra và cập nhật trạng thái theo dõi và người theo dõi
+    const [resultUser, resultUserToFollow] = await Promise.all([
+        Users.updateOne({ _id: userObjectId }, { $addToSet: { following: userToFollowObjectId } }),
+        Users.updateOne({ _id: userToFollowObjectId }, { $addToSet: { followers: userObjectId } }),
+    ]);
+
+    if (resultUser.modifiedCount === 0 || resultUserToFollow.modifiedCount === 0) {
+        return next(new ErrorHandler('Không thể theo dõi người dùng. Vui lòng thử lại sau!', 400));
     }
-
-    // Nếu người dùng mình định follow đã follow mình thì sẽ thành bạn bè
-    if (user?.followers.includes(userToFollow._id)) {
-        user.friends.push(userToFollow._id);
-        userToFollow.friends.push(user._id);
-    }
-
-    user?.following.push(userToFollow._id);
-    userToFollow?.followers.push(user._id);
-
-    await user.save();
-    await userToFollow.save();
 
     res.status(200).json({
         success: true,
@@ -77,20 +72,26 @@ export const followUser = TryCatch(async (req: Request & { user?: userDetailsTyp
     });
 });
 
-export const unFollow = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
+export const unFollow = TryCatch(async (req: Request & { user?: { id: string } }, res: Response, next: NextFunction) => {
     const { userId }: { userId: string } = req.body;
 
     if (!userId) {
         return next(new ErrorHandler('Please provide userId', 400));
     }
 
-    const resultUnFollow = await Users.updateOne({ _id: req.user?.id }, { $pull: { following: userId } });
+    const userObjectId = new Types.ObjectId(req.user?.id);
+    const userToUnFollowObjectId = new Types.ObjectId(userId);
+
+    // Kiểm tra và cập nhật trạng thái theo dõi và người theo dõi
+    const [resultUnFollow, resultRemoveFollower] = await Promise.all([
+        Users.updateOne({ _id: req.user?.id }, { $pull: { following: userToUnFollowObjectId } }),
+
+        Users.updateOne({ _id: userId }, { $pull: { followers: userObjectId } }),
+    ]);
 
     if (resultUnFollow.modifiedCount === 0) {
         return next(new ErrorHandler('Hủy follow thất bại. Vui lòng thử lại sau!', 400));
     }
-
-    const resultRemoveFollower = await Users.updateOne({ _id: userId }, { $pull: { followers: req.user?.id } });
 
     if (resultRemoveFollower.modifiedCount === 0) {
         return next(new ErrorHandler('Có lỗi xảy ra vui lòng thử lại!', 400));
@@ -102,37 +103,88 @@ export const unFollow = TryCatch(async (req: Request & { user?: userDetailsType[
     });
 });
 
-export const addFriend = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
+export const addFriend = TryCatch(async (req: Request & { user?: { id: string } }, res: Response, next: NextFunction) => {
     const { userId }: { userId: string } = req.body;
 
     if (!userId) {
         return next(new ErrorHandler('Please provide userId', 400));
     }
 
-    const user = await Users.findById(req.user?.id);
-    const userToAddFriend = await Users.findById(userId);
+    const userObjectId = new Types.ObjectId(req.user?.id);
+    const userToAddFriendObjectId = new Types.ObjectId(userId);
 
-    if (!user) {
-        return next(new ErrorHandler('User not found!', 404));
-    }
+    // Kiểm tra và cập nhật trạng thái bạn bè và người theo dõi
 
-    if (!userToAddFriend) {
-        return next(new ErrorHandler('User not found!', 404));
-    }
+    /**
+     * $addToSet: Chỉ thêm một phần tử vào mảng nếu nó chưa tồn tại trong mảng.
+     * Điều này có nghĩa là nó giúp ngăn chặn các mục trùng lặp trong mảng.
+     *
+     * $push: Thêm một phần tử vào mảng bất kể nó đã tồn tại trong mảng hay chưa,
+     * điều này có thể dẫn đến các mục nhập trùng lặp.
+     */
+    const [resultUser, resultUserToAddFriend] = await Promise.all([
+        Users.updateOne(
+            { _id: req.user?.id },
+            {
+                $addToSet: { following: userToAddFriendObjectId, friends: userToAddFriendObjectId },
+            },
+        ),
 
-    if (!userToAddFriend.following.includes(user._id)) {
+        Users.updateOne(
+            { _id: userId },
+            {
+                $addToSet: { friends: userObjectId, followers: userObjectId },
+            },
+        ),
+    ]);
+
+    if (resultUser.matchedCount === 0) {
         return next(new ErrorHandler('Đối phương không theo dõi hoặc hủy theo dõi bạn!', 400));
     }
 
-    user.friends.push(userToAddFriend._id);
-    userToAddFriend.friends.push(user._id);
-    userToAddFriend.followers.push(user._id);
-
-    await user.save();
-    await userToAddFriend.save();
+    if (resultUser.modifiedCount === 0 || resultUserToAddFriend.modifiedCount === 0) {
+        return next(new ErrorHandler('Không thể kết bạn. Vui lòng thử lại sau!', 400));
+    }
 
     res.status(200).json({
         success: true,
         message: 'Cả hai đã trở thành bạn bè!',
+    });
+});
+
+export const unFriend = TryCatch(async (req: Request & { user?: { id: string } }, res: Response, next: NextFunction) => {
+    const { userId }: { userId: string } = req.body;
+
+    if (!userId) {
+        return next(new ErrorHandler('Please provide userId', 400));
+    }
+
+    const userObjectId = new Types.ObjectId(req.user?.id);
+    const userToUnFriendObjectId = new Types.ObjectId(userId);
+
+    // Sử dụng điều kiện để kiểm tra và cập nhật trực tiếp
+    const [resultUser, resultUserToUnFriend] = await Promise.all([
+        Users.updateOne(
+            { _id: req.user?.id },
+            {
+                $pull: { friends: userToUnFriendObjectId, following: userToUnFriendObjectId },
+            },
+        ),
+
+        Users.updateOne(
+            { _id: userId },
+            {
+                $pull: { friends: userObjectId, followers: userObjectId },
+            },
+        ),
+    ]);
+
+    if (resultUser.modifiedCount === 0 || resultUserToUnFriend.modifiedCount === 0) {
+        return next(new ErrorHandler('Không thể hủy kết bạn. Vui lòng thử lại sau!', 400));
+    }
+
+    res.status(200).json({
+        success: true,
+        message: 'Hủy kết bạn thành công!',
     });
 });
