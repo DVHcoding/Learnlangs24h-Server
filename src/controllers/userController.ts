@@ -101,3 +101,38 @@ export const unFollow = TryCatch(async (req: Request & { user?: userDetailsType[
         message: 'Unfollowed successfully',
     });
 });
+
+export const addFriend = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
+    const { userId }: { userId: string } = req.body;
+
+    if (!userId) {
+        return next(new ErrorHandler('Please provide userId', 400));
+    }
+
+    const user = await Users.findById(req.user?.id);
+    const userToAddFriend = await Users.findById(userId);
+
+    if (!user) {
+        return next(new ErrorHandler('User not found!', 404));
+    }
+
+    if (!userToAddFriend) {
+        return next(new ErrorHandler('User not found!', 404));
+    }
+
+    if (!userToAddFriend.following.includes(user._id)) {
+        return next(new ErrorHandler('Đối phương không theo dõi hoặc hủy theo dõi bạn!', 400));
+    }
+
+    user.friends.push(userToAddFriend._id);
+    userToAddFriend.friends.push(user._id);
+    userToAddFriend.followers.push(user._id);
+
+    await user.save();
+    await userToAddFriend.save();
+
+    res.status(200).json({
+        success: true,
+        message: 'Cả hai đã trở thành bạn bè!',
+    });
+});
