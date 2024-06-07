@@ -76,3 +76,22 @@ export const followUser = TryCatch(async (req: Request & { user?: userDetailsTyp
         message: 'User followed successfully',
     });
 });
+
+export const unFollow = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
+    const { userId }: { userId: string } = req.body;
+
+    if (!userId) {
+        return next(new ErrorHandler('Please provide userId', 400));
+    }
+
+    const resultUnFollow = await Users.updateOne({ _id: req.user?.id }, { $pull: { following: userId } });
+
+    if (resultUnFollow.modifiedCount === 0) {
+        return next(new ErrorHandler('Failed to unfollow user or user was not being followed', 400));
+    }
+
+    res.status(200).json({
+        success: true,
+        message: 'Unfollowed successfully',
+    });
+});
