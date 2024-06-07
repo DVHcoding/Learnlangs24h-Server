@@ -59,8 +59,10 @@ export const followUser = TryCatch(async (req: Request & { user?: userDetailsTyp
         return next(new ErrorHandler('User not found!', 404));
     }
 
+    // Nếu người dùng mình định follow đã follow mình thì sẽ thành bạn bè
     if (user?.followers.includes(userToFollow._id)) {
-        return next(new ErrorHandler('You are already following this user', 400));
+        user.friends.push(userToFollow._id);
+        userToFollow.friends.push(user._id);
     }
 
     user?.following.push(userToFollow._id);
