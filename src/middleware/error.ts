@@ -23,7 +23,7 @@ export const errorMiddleware = (err: ErrorHandler & { code?: number }, req: Requ
 
     // Duplicate email in Mongodb
     if (err.code === 11000) {
-        const message = `Một số thông tin đã được đăng ký. Vui lòng thử lại!`;
+        const message = `Error Duplicate Fields`;
         err = new ErrorHandler(message, 400);
     }
 
