@@ -61,6 +61,7 @@ export const userDetailsPopulate = TryCatch(
 /*                                    POST                                    */
 /* -------------------------------------------------------------------------- */
 
+// Theo dõi
 export const followUser = TryCatch(async (req: Request & { user?: { id: string } }, res: Response, next: NextFunction) => {
     const { userId }: { userId: string } = req.body;
 
