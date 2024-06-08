@@ -88,6 +88,7 @@ export const followUser = TryCatch(async (req: Request & { user?: { id: string }
     });
 });
 
+// Hủy theo dõi
 export const unFollow = TryCatch(async (req: Request & { user?: { id: string } }, res: Response, next: NextFunction) => {
     const { userId }: { userId: string } = req.body;
 
