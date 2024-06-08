@@ -42,6 +42,21 @@ export const userDetailsByNickName = TryCatch(async (req: Request, res: Response
     });
 });
 
+// Xem Chi Tiết thông tin user kèm theo thông tin chi tiết các trường following, followers
+export const userDetailsPopulate = TryCatch(
+    async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
+        const user = await Users.findById(req.user?.id)
+            .select('-googleId')
+            .populate({ path: 'following', select: '-googleId' })
+            .populate({ path: 'followers', select: '-googleId' });
+
+        res.status(200).json({
+            success: true,
+            user,
+        });
+    },
+);
+
 /* -------------------------------------------------------------------------- */
 /*                                    POST                                    */
 /* -------------------------------------------------------------------------- */

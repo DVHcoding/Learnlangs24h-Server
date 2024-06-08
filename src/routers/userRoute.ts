@@ -7,7 +7,15 @@ import express, { Router } from 'express';
 // #    IMPORT Components   #
 // ##########################
 import { isAuthenticated } from '../middleware/auth.js';
-import { addFriend, followUser, unFollow, unFriend, userDetails, userDetailsByNickName } from '../controllers/userController.js';
+import {
+    addFriend,
+    followUser,
+    unFollow,
+    unFriend,
+    userDetails,
+    userDetailsByNickName,
+    userDetailsPopulate,
+} from '../controllers/userController.js';
 
 // ##########################
 const router: Router = express.Router();
@@ -16,6 +24,7 @@ const router: Router = express.Router();
 /*                                     GET                                    */
 /* -------------------------------------------------------------------------- */
 router.get('/me', isAuthenticated, userDetails);
+router.get('/userDetailsPopulate', isAuthenticated, userDetailsPopulate);
 router.get('/profile/:nickname', userDetailsByNickName);
 
 /* -------------------------------------------------------------------------- */
