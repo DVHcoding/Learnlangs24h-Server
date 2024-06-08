@@ -24,7 +24,7 @@ const router: Router = express.Router();
 /*                                     GET                                    */
 /* -------------------------------------------------------------------------- */
 router.get('/me', isAuthenticated, userDetails);
-router.get('/userDetailsPopulate', isAuthenticated, userDetailsPopulate);
+router.get('/userDetailsPopulate/:nickname', isAuthenticated, userDetailsPopulate);
 router.get('/profile/:nickname', userDetailsByNickName);
 
 /* -------------------------------------------------------------------------- */
