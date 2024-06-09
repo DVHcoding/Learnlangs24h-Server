@@ -78,6 +78,7 @@ export const followUser = TryCatch(async (req: Request & { user?: { id: string }
         Users.updateOne({ _id: userToFollowObjectId }, { $addToSet: { followers: userObjectId } }),
     ]);
 
+    // Nếu không update được. ModifiedCount == 0 (Tức là k có sự thay đổi) thì trả về status 400
     if (resultUser.modifiedCount === 0 || resultUserToFollow.modifiedCount === 0) {
         return next(new ErrorHandler('Không thể theo dõi người dùng. Vui lòng thử lại sau!', 400));
     }
