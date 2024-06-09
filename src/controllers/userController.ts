@@ -120,6 +120,7 @@ export const unFollow = TryCatch(async (req: Request & { user?: { id: string } }
     });
 });
 
+// Kết bạn
 export const addFriend = TryCatch(async (req: Request & { user?: { id: string } }, res: Response, next: NextFunction) => {
     const { userId }: { userId: string } = req.body;
 
