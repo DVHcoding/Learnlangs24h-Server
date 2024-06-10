@@ -28,7 +28,10 @@ connectDatabase();
 const server = createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: '*', // Cấu hình CORS nếu cần thiết
+        origin: [
+            "http://localhost:5173", 
+            "http://localhost:8080"
+        ], // Cấu hình CORS nếu cần thiết
         methods: ['GET', 'POST'],
     },
 });
