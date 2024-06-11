@@ -10,6 +10,7 @@ import { isAuthenticated } from '../middleware/auth.js';
 import {
     addFriend,
     followUser,
+    searchUsers,
     unFollow,
     unFriend,
     userDetails,
@@ -26,6 +27,7 @@ const router: Router = express.Router();
 router.get('/me', isAuthenticated, userDetails);
 router.get('/userDetailsPopulate/:nickname', isAuthenticated, userDetailsPopulate);
 router.get('/profile/:nickname', userDetailsByNickName);
+router.get('/user', isAuthenticated, searchUsers);
 
 /* -------------------------------------------------------------------------- */
 /*                                    POST                                    */

@@ -7,10 +7,11 @@ import { Types } from 'mongoose';
 // ##########################
 // #    IMPORT Components   #
 // ##########################
-import Users from '../models/userModel.js';
+import Users, { UserType } from '../models/userModel.js';
 import { TryCatch } from '../middleware/error.js';
 import { userDetailsType } from '../types/types.js';
 import ErrorHandler from '../utils/errorHandler.js';
+import { removeVietnameseTones } from '../utils/regexVietnamese.js';
 
 /* -------------------------------------------------------------------------- */
 /*                                     GET                                    */
@@ -53,6 +54,43 @@ export const userDetailsPopulate = TryCatch(
         res.status(200).json({
             success: true,
             user,
+        });
+    },
+);
+
+// Search friends
+export const searchUsers = TryCatch(
+    async (req: Request & { user?: { id: string; friends: string } }, res: Response, next: NextFunction) => {
+        const { username = '' } = req.query as { username: string };
+
+        if (username === '') {
+            return next(new ErrorHandler('User not found!', 404));
+        }
+
+        const regexName = removeVietnameseTones(username).toLowerCase();
+
+        const allUsers = await Users.find({ _id: { $in: req.user?.friends } }).select('-googleId');
+
+        // console.log(allUsers);
+
+        const filteredUsers: UserType[] = [];
+        allUsers.forEach((user) => {
+            const lowercaseUsername = removeVietnameseTones(user.username).toLowerCase();
+            if (lowercaseUsername.match(regexName)) {
+                // Nếu khớp, thêm user vào mảng filteredUsers
+                filteredUsers.push(user);
+            }
+        });
+
+        // Kiểm tra nếu không có user nào thỏa mãn điều kiện
+        if (filteredUsers.length === 0) {
+            return next(new ErrorHandler('User not found!', 404));
+        }
+
+        // Trả về danh sách username của các user thỏa mãn điều kiện
+        res.status(200).json({
+            success: true,
+            users: filteredUsers,
         });
     },
 );
