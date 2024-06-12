@@ -76,7 +76,9 @@ export const searchUsers = TryCatch(
         const filteredUsers: UserType[] = [];
         allUsers.forEach((user) => {
             const lowercaseUsername = removeVietnameseTones(user.username).toLowerCase();
-            if (lowercaseUsername.match(regexName)) {
+
+            // Có thể dùng match() thay vì includes để tìm phức tạp hơn
+            if (lowercaseUsername.includes(regexName)) {
                 // Nếu khớp, thêm user vào mảng filteredUsers
                 filteredUsers.push(user);
             }
