@@ -67,7 +67,7 @@ export const searchUsers = TryCatch(
             return next(new ErrorHandler('User not found!', 404));
         }
 
-        const regexName = removeVietnameseTones(username).toLowerCase();
+        const regexName = removeVietnameseTones(username.trim()).toLowerCase();
 
         const allUsers = await Users.find({ _id: { $in: req.user?.friends } }).select('-googleId');
 
