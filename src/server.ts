@@ -48,25 +48,29 @@ io.on('connection', (socket) => {
 
     // Lắng nghe sự kiện NEW_MESSAGE
     socket.on(NEW_MESSAGE, async ({ chatId, members, message }: { chatId: string; members: [{ _id: string }]; message: string }) => {
+        // Tạo đối tượng tin nhắn để gửi cho client
         const messageForRealTime = {
             content: message,
-            _id: uuid(),
+            _id: uuid(), // Tạo một ID duy nhất cho tin nhắn
             sender: {
-                _id: user._id,
-                name: user.name,
+                _id: user._id, // ID của người gửi tin nhắn
+                name: user.name, // Tên của người gửi tin nhắn
             },
-            chat: chatId,
-            createdAt: new Date().toISOString(),
+            chat: chatId, // ID của cuộc trò chuyện
+            createdAt: new Date().toISOString(), // Thời gian gửi tin nhắn
         };
 
+        // Tạo đối tượng tin nhắn để lưu vào cơ sở dữ liệu
         const messageForDB = {
             content: message,
-            sender: user._id,
-            chat: chatId,
+            sender: user._id, // ID của người gửi tin nhắn
+            chat: chatId, // ID của cuộc trò chuyện
         };
 
+        // Lấy các socket của các thành viên trong cuộc trò chuyện
         const membersSocket = getSockets(members);
 
+        // Gửi tin nhắn mới đến tất cả các socket của các thành viên trong cuộc trò chuyện
         io.to(membersSocket).emit(NEW_MESSAGE, {
             chatId,
             message: messageForRealTime,
