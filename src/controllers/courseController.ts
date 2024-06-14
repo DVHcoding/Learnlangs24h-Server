@@ -24,7 +24,7 @@ import VideoLecture from '../models/Courses/videoLectureModel.js';
 import cloudinary from '../config/cloudinary.js';
 import ErrorHandler from '../utils/errorHandler.js';
 import FillBlankExercise, { Question } from '../models/Courses/fillBlankExerciseModel.js';
-import UserProcessStatus from '../models/Courses/userProcessStatusModel.js';
+import UserProcessStatus from '../models/Users/userProcessStatusModel.js';
 import {
     CreateUnitLessonAndFillBlankExerciseRequestType,
     CreateUnitLessonAndVideoLectureContentRequestType,

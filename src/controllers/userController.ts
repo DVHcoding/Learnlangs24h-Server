@@ -7,7 +7,7 @@ import { Types } from 'mongoose';
 // ##########################
 // #    IMPORT Components   #
 // ##########################
-import Users, { UserType } from '../models/Courses/userModel.js';
+import Users, { UserType } from '../models/Users/userModel.js';
 import { TryCatch } from '../middleware/error.js';
 import { userDetailsType } from '../types/types.js';
 import ErrorHandler from '../utils/errorHandler.js';

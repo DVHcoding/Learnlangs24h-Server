@@ -2,7 +2,7 @@
 // #      IMPORT NPM        #
 // ##########################
 import { Response } from 'express';
-import Users, { UserDocument } from '../models/Courses/userModel.js';
+import Users, { UserDocument } from '../models/Users/userModel.js';
 
 // ##########################
 // #    IMPORT Components   #
