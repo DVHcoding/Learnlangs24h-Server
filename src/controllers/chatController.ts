@@ -11,7 +11,7 @@ import Chat, { ChatType } from '../models/Messenger/chatModel.js';
 import { userDetailsType } from '../types/types.js';
 import { getOtherMember } from '../utils/helper.js';
 
-const newGroupChat = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
+export const newGroupChat = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
     const { name, members } = req.body;
 
     const allMembers = [...members, req.user];
