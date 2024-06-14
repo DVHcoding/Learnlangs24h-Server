@@ -17,14 +17,14 @@ const nodeCache = new NodeCache({
 // #    IMPORT Components   #
 // ##########################
 import { TryCatch } from '../middleware/error.js';
-import Course, { CourseType } from '../models/courseModel.js';
-import Lesson from '../models/lessonModel.js';
-import UnitLesson from '../models/unitLessonModel.js';
-import VideoLecture from '../models/videoLectureModel.js';
+import Course, { CourseType } from '../models/Courses/courseModel.js';
+import Lesson from '../models/Courses/lessonModel.js';
+import UnitLesson from '../models/Courses/unitLessonModel.js';
+import VideoLecture from '../models/Courses/videoLectureModel.js';
 import cloudinary from '../config/cloudinary.js';
 import ErrorHandler from '../utils/errorHandler.js';
-import FillBlankExercise, { Question } from '../models/fillBlankExerciseModel.js';
-import UserProcessStatus from '../models/userProcessStatusModel.js';
+import FillBlankExercise, { Question } from '../models/Courses/fillBlankExerciseModel.js';
+import UserProcessStatus from '../models/Courses/userProcessStatusModel.js';
 import {
     CreateUnitLessonAndFillBlankExerciseRequestType,
     CreateUnitLessonAndVideoLectureContentRequestType,

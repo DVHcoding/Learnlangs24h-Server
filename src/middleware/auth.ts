@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 // ##########################
 // #    IMPORT Components   #
 // ##########################
-import Users from '../models/userModel.js';
+import Users from '../models/Courses/userModel.js';
 import ErrorHandler from '../utils/errorHandler.js';
 import { userDetailsType } from '../types/types.js';
 

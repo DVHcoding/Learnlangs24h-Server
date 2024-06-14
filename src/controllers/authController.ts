@@ -6,7 +6,7 @@ import { NextFunction, Request, Response } from 'express';
 // ##########################
 // #    IMPORT Components   #
 // ##########################
-import Users from '../models/userModel.js';
+import Users from '../models/Courses/userModel.js';
 import { TryCatch } from '../middleware/error.js';
 import ErrorHandler from '../utils/errorHandler.js';
 import { sendGoogleToken, sendToken } from '../utils/jwtToken.js';
