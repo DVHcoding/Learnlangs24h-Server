@@ -12,9 +12,9 @@ import { userDetailsType } from '../types/types.js';
 import { getOtherMember } from '../utils/helper.js';
 
 export const newGroupChat = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
-    const { name, members } = req.body;
+    const { name, members }: { name: string; members: string } = req.body;
 
-    const allMembers = [...members, req.user];
+    const allMembers = [...members, req.user?.id];
 
     await Chat.create({
         name,
