@@ -8,6 +8,7 @@ import mongoose from 'mongoose';
 // ##########################
 
 import { userSocketIDs } from '../server.js';
+import { MemberType } from '../models/Messenger/chatModel.js';
 
 interface UserType {
     _id: string;
@@ -18,7 +19,7 @@ const getSockets: (users: UserType[]) => string[] = (users) => {
     return sockets;
 };
 
-export const getOtherMember = (members: mongoose.Types.ObjectId[], userId: string) =>
+export const getOtherMember = (members: MemberType[], userId: string) =>
     members.find((member) => member._id.toString() !== userId.toString());
 
 export { getSockets };

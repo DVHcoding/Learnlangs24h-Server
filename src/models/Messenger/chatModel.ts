@@ -3,11 +3,20 @@
 // ##########################
 import mongoose, { Schema } from 'mongoose';
 
+export interface MemberType {
+    _id: string;
+    username: string;
+    photo: {
+        public_id: string;
+        url: string;
+    };
+}
+
 export interface ChatType extends mongoose.Document {
     name: string;
     groupChat: boolean;
     creator: mongoose.Types.ObjectId;
-    members: mongoose.Types.ObjectId[];
+    members: (mongoose.Types.ObjectId & MemberType)[];
     createdAt?: Date;
     updatedAt?: Date;
 }
