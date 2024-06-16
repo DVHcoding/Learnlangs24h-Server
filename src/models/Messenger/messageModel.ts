@@ -34,7 +34,7 @@ const messageSchema = new Schema(
         ],
         sender: {
             type: mongoose.Types.ObjectId,
-            ref: 'User',
+            ref: 'Users',
             required: true,
         },
         chat: {
