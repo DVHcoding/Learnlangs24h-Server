@@ -31,7 +31,7 @@ export const newGroupChat = TryCatch(async (req: Request & { user?: userDetailsT
 
 export const getMyChats = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
     // Tìm các cuộc trò chuyện mà trong đó người dùng hiện tại là thành viên
-    const chats: ChatType[] = await Chat.find({ members: req.user?.id }).populate('members', 'name photo');
+    const chats: ChatType[] = await Chat.find({ members: req.user?.id }).populate('members', 'username photo');
 
     // // Chuyển đổi các cuộc trò chuyện để trả về định dạng mong muốn
     // const transformedChats = chats.map(({ _id, name, members, groupChat }) => {
@@ -59,5 +59,6 @@ export const getMyChats = TryCatch(async (req: Request & { user?: userDetailsTyp
     // Trả về phản hồi thành công với danh sách các cuộc trò chuyện đã chuyển đổi
     return res.status(200).json({
         success: true,
+        chats,
     });
 });

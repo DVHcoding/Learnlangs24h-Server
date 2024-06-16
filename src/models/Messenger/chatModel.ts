@@ -21,12 +21,12 @@ const chatSchema = new Schema(
         },
         creator: {
             type: mongoose.Types.ObjectId,
-            ref: 'User',
+            ref: 'Users',
         },
         members: [
             {
                 type: mongoose.Types.ObjectId,
-                ref: 'User',
+                ref: 'Users',
             },
         ],
     },
