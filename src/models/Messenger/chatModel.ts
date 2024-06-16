@@ -14,7 +14,10 @@ export interface ChatType extends mongoose.Document {
 
 const chatSchema = new Schema(
     {
-        name: [String],
+        name: {
+            type: String,
+            required: true,
+        },
         groupChat: {
             type: Boolean,
             default: false,
