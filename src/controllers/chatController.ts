@@ -12,24 +12,9 @@ import Chat, { ChatType } from '../models/Messenger/chatModel.js';
 import { userDetailsType } from '../types/types.js';
 import { getOtherMember } from '../utils/helper.js';
 
-export const newGroupChat = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
-    const { name, members }: { name: string; members: string } = req.body;
-
-    const allMembers = [...members, req.user?.id];
-
-    await Chat.create({
-        name,
-        groupChat: true,
-        creator: req.user?.id,
-        members: allMembers,
-    });
-
-    return res.status(201).json({
-        success: true,
-        message: 'Group Created',
-    });
-});
-
+/* -------------------------------------------------------------------------- */
+/*                                     GET                                    */
+/* -------------------------------------------------------------------------- */
 export const getMyChats = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
     const userId = req.user?.id as string;
 
@@ -66,5 +51,55 @@ export const getMyChats = TryCatch(async (req: Request & { user?: userDetailsTyp
     return res.status(200).json({
         success: true,
         chats: transformedChats,
+    });
+});
+
+/* -------------------------------------------------------------------------- */
+/*                                    POST                                    */
+/* -------------------------------------------------------------------------- */
+export const getChatById = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
+    const userId = req.user?.id as string;
+    const chatById = await Chat.findOne({ groupChat: false, members: req.params.id });
+
+    if (chatById) {
+        return res.status(200).json({
+            success: true,
+            chatId: chatById._id,
+        });
+    }
+
+    const { name, members }: { name: string; members: string } = req.body;
+
+    const allMembers = [...members, userId];
+
+    const newChat: ChatType = await Chat.create({
+        name,
+        groupChat: allMembers.length > 2,
+        creator: userId,
+        members: allMembers,
+    });
+
+    res.status(200).json({
+        success: true,
+        chatId: newChat._id,
+    });
+});
+
+export const newGroupChat = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
+    const userId = req.user?.id as string;
+    const { name, members }: { name: string; members: string } = req.body;
+
+    const allMembers = [...members, userId];
+
+    await Chat.create({
+        name,
+        groupChat: allMembers.length > 2,
+        creator: userId,
+        members: allMembers,
+    });
+
+    res.status(200).json({
+        success: true,
+        message: 'New Group created!',
     });
 });
