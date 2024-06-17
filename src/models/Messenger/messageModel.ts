@@ -19,7 +19,10 @@ export interface MessageType extends mongoose.Document {
 
 const messageSchema = new Schema(
     {
-        content: [String],
+        content: {
+            type: String,
+            required: true,
+        },
         attachments: [
             {
                 public_id: {

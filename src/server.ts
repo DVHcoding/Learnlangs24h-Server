@@ -15,6 +15,7 @@ import app from './app.js';
 import connectDatabase from './config/database.js';
 import { NEW_MESSAGE } from './constants/events.js';
 import { getSockets } from './utils/helper.js';
+import { NewMessagePayload } from './types/types.js';
 
 ///////////////////////////////////////////////////////////
 // Lấy số lượng CPU của hệ thống
@@ -47,7 +48,7 @@ io.on('connection', (socket) => {
     console.log(userSocketIDs);
 
     // Lắng nghe sự kiện NEW_MESSAGE
-    socket.on(NEW_MESSAGE, async ({ chatId, members, message }: { chatId: string; members: [{ _id: string }]; message: string }) => {
+    socket.on(NEW_MESSAGE, async ({ chatId, members, message }: NewMessagePayload) => {
         // Tạo đối tượng tin nhắn để gửi cho client
         const messageForRealTime = {
             content: message,
