@@ -40,12 +40,11 @@ export const userSocketIDs = new Map();
 // Lắng nghe sự kiện kết nối từ client
 io.on('connection', (socket) => {
     const user = {
-        _id: 'abcid01',
-        name: 'hung',
+        _id: '660fee28b0db2c2388624d8c',
+        name: 'Hùng Đỗ',
     };
 
-    userSocketIDs.set(user._id.toString(), socket.id);
-    console.log(userSocketIDs);
+    userSocketIDs.set(user._id, socket.id);
 
     // Lắng nghe sự kiện NEW_MESSAGE
     socket.on(NEW_MESSAGE, async ({ chatId, members, message }: NewMessagePayload) => {
@@ -76,8 +75,6 @@ io.on('connection', (socket) => {
             chatId,
             message: messageForRealTime,
         });
-
-        console.log('New message', messageForRealTime);
     });
 
     // Lắng nghe sự kiện ngắt kết nối
