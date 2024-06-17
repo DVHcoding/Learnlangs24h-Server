@@ -72,12 +72,8 @@ export interface UserRequestType {
     googleId?: string;
 }
 
-interface Member {
-    _id: string;
-}
-
 export interface NewMessagePayload {
     chatId: string;
-    members: Member[];
+    members: string[];
     message: string;
 }
