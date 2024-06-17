@@ -11,6 +11,7 @@ import { TryCatch } from '../middleware/error.js';
 import Chat, { ChatType } from '../models/Messenger/chatModel.js';
 import { userDetailsType } from '../types/types.js';
 import { getOtherMember } from '../utils/helper.js';
+import ErrorHandler from '../utils/errorHandler.js';
 
 /* -------------------------------------------------------------------------- */
 /*                                     GET                                    */
@@ -51,6 +52,18 @@ export const getMyChats = TryCatch(async (req: Request & { user?: userDetailsTyp
     return res.status(200).json({
         success: true,
         chats: transformedChats,
+    });
+});
+
+export const getChatDetails = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
+    const chat = await Chat.findById(req.params.id);
+
+    if (!chat) return next(new ErrorHandler('Chat not found!', 404));
+
+    // Trả về phản hồi thành công với danh sách các cuộc trò chuyện đã chuyển đổi
+    return res.status(200).json({
+        success: true,
+        chat,
     });
 });
 
