@@ -74,6 +74,7 @@ export interface UserRequestType {
 
 export interface NewMessagePayload {
     chatId: string;
+    senderId: string;
     members: string[];
     message: string;
 }

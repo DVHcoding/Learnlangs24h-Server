@@ -15,6 +15,8 @@ const CHAT_LEAVED: string = 'CHAT_LEAVED';
 
 const ONLINE_USERS: string = 'ONLINE_USERS';
 
+const ADD_USER: string = 'ADD_USER';
+
 export {
     ALERT,
     REFETCH_CHATS,
@@ -27,4 +29,5 @@ export {
     CHAT_JOINED,
     CHAT_LEAVED,
     ONLINE_USERS,
+    ADD_USER,
 };

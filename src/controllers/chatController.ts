@@ -56,7 +56,7 @@ export const getMyChats = TryCatch(async (req: Request & { user?: userDetailsTyp
 });
 
 export const getChatDetails = TryCatch(async (req: Request & { user?: userDetailsType['user'] }, res: Response, next: NextFunction) => {
-    const chat = await Chat.findById(req.params.id);
+    const chat = await Chat.findById(req.params.id).populate('members', 'username photo');
 
     if (!chat) return next(new ErrorHandler('Chat not found!', 404));
 
