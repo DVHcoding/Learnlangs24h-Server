@@ -12,7 +12,11 @@ export interface userDetailsType extends Request {
     };
 }
 
-export type ControllerType = (req: Request, res: Response, next: NextFunction) => Promise<void | Response<any, Record<string, any>>>;
+export type ControllerType = (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => Promise<void | Response<any, Record<string, any>>>;
 
 export interface CreateUnitLessonAndVideoLectureContentRequestType {
     title: string;
@@ -77,4 +81,10 @@ export interface NewMessagePayload {
     senderId: string;
     members: string[];
     message: string;
+}
+
+export interface MessageForDBType {
+    content: string;
+    sender: string;
+    chat: string;
 }

@@ -14,8 +14,10 @@ dotenv.config();
 import app from './app.js';
 import connectDatabase from './config/database.js';
 import { ADD_USER, NEW_MESSAGE } from './constants/events.js';
-import { NewMessagePayload } from './types/types.js';
+import { MessageForDBType, NewMessagePayload } from './types/types.js';
 import Users from './models/Users/userModel.js';
+import Message from './models/Messenger/messageModel.js';
+import ErrorHandler from './utils/errorHandler.js';
 
 ///////////////////////////////////////////////////////////
 // Lấy số lượng CPU của hệ thống
@@ -46,6 +48,7 @@ interface UserSockets {
 let users: UserSockets[] = [];
 
 io.on('connection', (socket) => {
+    /////////////////////////////////////////////////////////////////
     socket.on(ADD_USER, async ({ userId }) => {
         const isUserExist = users.find((user) => user.userId === userId);
         if (!isUserExist) {
@@ -54,13 +57,17 @@ io.on('connection', (socket) => {
             io.emit(ADD_USER, users);
         }
     });
+    /////////////////////////////////////////////////////////////////
 
     // Lắng nghe sự kiện NEW_MESSAGE
     socket.on(NEW_MESSAGE, async ({ senderId, chatId, members, message }: NewMessagePayload) => {
+        /////////////////////////////////////////////////////////////////
         if (!senderId || !chatId || !members || !message) {
             return;
         }
+        /////////////////////////////////////////////////////////////////
 
+        /////////////////////////////////////////////////////////////////
         const sender = users.find((user) => user.userId === senderId);
         const receivers = members.filter((member) => member !== senderId);
         const receiversUsers = users.filter((user) => receivers.includes(user.userId));
@@ -69,7 +76,9 @@ io.on('connection', (socket) => {
         if (!sender) {
             return;
         }
+        /////////////////////////////////////////////////////////////////
 
+        /////////////////////////////////////////////////////////////////
         // Tạo đối tượng tin nhắn để gửi cho client
         const messageForRealTime = {
             content: message,
@@ -81,14 +90,18 @@ io.on('connection', (socket) => {
             chat: chatId, // ID của cuộc trò chuyện
             createdAt: new Date().toISOString(), // Thời gian gửi tin nhắn
         };
+        /////////////////////////////////////////////////////////////////
 
+        /////////////////////////////////////////////////////////////////
         // Tạo đối tượng tin nhắn để lưu vào cơ sở dữ liệu
-        const messageForDB = {
+        const messageForDB: MessageForDBType = {
             content: message,
             sender: user?._id, // ID của người gửi tin nhắn
             chat: chatId, // ID của cuộc trò chuyện
         };
+        /////////////////////////////////////////////////////////////////
 
+        /////////////////////////////////////////////////////////////////
         if (receiversUsers.length > 0) {
             io.to(receiversUsers.map((receiver) => receiver.socketId))
                 .to(sender.socketId)
@@ -102,6 +115,15 @@ io.on('connection', (socket) => {
                 message: messageForRealTime,
             });
         }
+        /////////////////////////////////////////////////////////////////
+
+        /////////////////////////////////////////////////////////////////
+        try {
+            await Message.create(messageForDB);
+        } catch (error) {
+            return new ErrorHandler(`Có sự cố xảy ra!: ${error}`, 403);
+        }
+        /////////////////////////////////////////////////////////////////
     });
 
     // Lắng nghe sự kiện ngắt kết nối
