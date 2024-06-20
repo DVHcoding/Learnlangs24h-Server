@@ -17,6 +17,7 @@ const router: Router = express.Router();
 /* -------------------------------------------------------------------------- */
 router.get('/chat/my', isAuthenticated, getMyChats);
 router.get('/chat/details/:id', isAuthenticated, getChatDetails);
+router.get('/message/:id', isAuthenticated, getChatDetails);
 
 /* -------------------------------------------------------------------------- */
 /*                                    POST                                    */
