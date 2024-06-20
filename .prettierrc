@@ -4,6 +4,6 @@
     "tabWidth": 4,
     "useTabs": false,
     "bracketSpacing": true,
-    "printWidth": 140,
+    "printWidth": 130,
     "editor.formatOnType": false
 }

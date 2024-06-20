@@ -16,7 +16,7 @@ export interface ChatType extends mongoose.Document {
     name: string;
     groupChat: boolean;
     creator: mongoose.Types.ObjectId;
-    members: (mongoose.Types.ObjectId & MemberType)[];
+    members: (mongoose.Types.ObjectId & MemberType)[] & string;
     createdAt?: Date;
     updatedAt?: Date;
 }
