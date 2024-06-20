@@ -21,6 +21,10 @@ export interface MessageType extends mongoose.Document {
 
 const messageSchema = new Schema(
     {
+        _id: {
+            type: String, // Định nghĩa _id là kiểu String
+            default: uuid, // Sử dụng uuid để sinh ra giá trị mặc định cho _id
+        },
         content: {
             type: String,
             required: true,
@@ -52,14 +56,6 @@ const messageSchema = new Schema(
         timestamps: true,
     },
 );
-
-// Sử dụng pre-save middleware để tạo UUID cho _id
-messageSchema.pre('save', function (this: MessageType, next: mongoose.CallbackWithoutResultAndOptionalError) {
-    if (!this._id) {
-        this._id = uuid();
-    }
-    next();
-});
 
 const Message = mongoose.model<MessageType>('Message', messageSchema);
 
