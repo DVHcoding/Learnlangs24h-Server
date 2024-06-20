@@ -6,7 +6,7 @@ import express, { Router } from 'express';
 // ##########################
 // #    IMPORT Components   #
 // ##########################
-import { getChatById, getChatDetails, getMyChats, newGroupChat } from '../controllers/chatController.js';
+import { getChatById, getChatDetails, getMessages, getMyChats, newGroupChat } from '../controllers/chatController.js';
 import { isAuthenticated } from '../middleware/auth.js';
 
 // ##########################
@@ -17,7 +17,7 @@ const router: Router = express.Router();
 /* -------------------------------------------------------------------------- */
 router.get('/chat/my', isAuthenticated, getMyChats);
 router.get('/chat/details/:id', isAuthenticated, getChatDetails);
-router.get('/message/:id', isAuthenticated, getChatDetails);
+router.get('/message/:id', isAuthenticated, getMessages);
 
 /* -------------------------------------------------------------------------- */
 /*                                    POST                                    */
