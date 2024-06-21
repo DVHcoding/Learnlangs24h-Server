@@ -81,8 +81,8 @@ io.on('connection', (socket) => {
         /////////////////////////////////////////////////////////////////
         // Tạo đối tượng tin nhắn để gửi cho client
         const messageForRealTime = {
-            content: message,
             _id: uuid(), // Tạo một ID duy nhất cho tin nhắn
+            content: message,
             sender: {
                 _id: user?._id, // ID của người gửi tin nhắn
                 name: user?.username, // Tên của người gửi tin nhắn
