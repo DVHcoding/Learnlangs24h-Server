@@ -2,22 +2,17 @@
 // #      IMPORT NPM        #
 // ##########################
 import { Request, Response, NextFunction } from 'express';
-import mongoose from 'mongoose';
-import NodeCache from 'node-cache';
 
 // ##########################
 // #    IMPORT Components   #
 // ##########################
 import { TryCatch } from '../middleware/error.js';
 import Chat, { ChatType } from '../models/Messenger/chatModel.js';
-import { CachedMessages, userDetailsType } from '../types/types.js';
+import { userDetailsType } from '../types/types.js';
 import { getOtherMember } from '../utils/helper.js';
 import ErrorHandler from '../utils/errorHandler.js';
 import Message from '../models/Messenger/messageModel.js';
-
-const nodeCache = new NodeCache({
-    stdTTL: 3600, // 3600 giây.
-});
+import { mongoose } from '../libs/libs.js';
 
 /* -------------------------------------------------------------------------- */
 /*                                     GET                                    */
@@ -87,6 +82,7 @@ export const getMessages = TryCatch(
         /////////////////////////////////////////////////////////////////
         const chatId: string = req.params.id;
         const page: number = parseInt(req.query.page as string, 10) || 1;
+
         const userId = req.user?.id as string;
         /////////////////////////////////////////////////////////////////
 
@@ -100,16 +96,16 @@ export const getMessages = TryCatch(
 
         // Kiểm tra xem kết quả đã được lưu trong cache chưa
         /////////////////////////////////////////////////////////////////
-        const cacheKey = `messages_${chatId}_${page}`;
-        const cachedMessages = nodeCache.get<CachedMessages>(cacheKey);
+        // const cacheKey = `messages_${chatId}_${page}`;
+        // const cachedMessages = nodeCache.get<CachedMessages>(cacheKey);
 
-        if (cachedMessages) {
-            return res.status(200).json({
-                success: true,
-                messages: cachedMessages.messages,
-                totalPages: cachedMessages.totalPages,
-            });
-        }
+        // if (cachedMessages) {
+        //     return res.status(200).json({
+        //         success: true,
+        //         messages: cachedMessages.messages,
+        //         totalPages: cachedMessages.totalPages,
+        //     });
+        // }
         /////////////////////////////////////////////////////////////////
 
         const chat = await Chat.findById(chatId);
@@ -144,10 +140,10 @@ export const getMessages = TryCatch(
 
         // Lưu kết quả vào cach
         /////////////////////////////////////////////////////////////////
-        nodeCache.set(cacheKey, {
-            messages: messages.reverse(),
-            totalPages,
-        });
+        // nodeCache.set(cacheKey, {
+        //     messages: messages.reverse(),
+        //     totalPages,
+        // });
         /////////////////////////////////////////////////////////////////
 
         // Tại sao lại sử dụng reverse()?
