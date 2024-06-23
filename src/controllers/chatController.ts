@@ -3,16 +3,21 @@
 // ##########################
 import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
+import NodeCache from 'node-cache';
 
 // ##########################
 // #    IMPORT Components   #
 // ##########################
 import { TryCatch } from '../middleware/error.js';
 import Chat, { ChatType } from '../models/Messenger/chatModel.js';
-import { userDetailsType } from '../types/types.js';
+import { CachedMessages, userDetailsType } from '../types/types.js';
 import { getOtherMember } from '../utils/helper.js';
 import ErrorHandler from '../utils/errorHandler.js';
 import Message from '../models/Messenger/messageModel.js';
+
+const nodeCache = new NodeCache({
+    stdTTL: 3600, // 3600 giây.
+});
 
 /* -------------------------------------------------------------------------- */
 /*                                     GET                                    */
@@ -93,6 +98,20 @@ export const getMessages = TryCatch(
         const skip = (page - 1) * resultPerPage;
         /////////////////////////////////////////////////////////////////
 
+        // Kiểm tra xem kết quả đã được lưu trong cache chưa
+        /////////////////////////////////////////////////////////////////
+        const cacheKey = `messages_${chatId}_${page}`;
+        const cachedMessages = nodeCache.get<CachedMessages>(cacheKey);
+
+        if (cachedMessages) {
+            return res.status(200).json({
+                success: true,
+                messages: cachedMessages.messages,
+                totalPages: cachedMessages.totalPages,
+            });
+        }
+        /////////////////////////////////////////////////////////////////
+
         const chat = await Chat.findById(chatId);
 
         /////////////////////////////////////////////////////////////////
@@ -122,6 +141,14 @@ export const getMessages = TryCatch(
         // Math.ceil làm tròn lên để đảm bảo rằng nếu có tin nhắn lẻ, chúng vẫn được
         // hiển thị trong một trang riêng.Nếu không có tin nhắn nào, totalPages sẽ là 0.
         const totalPages = Math.ceil(totalMessagesCount / resultPerPage) || 0;
+
+        // Lưu kết quả vào cach
+        /////////////////////////////////////////////////////////////////
+        nodeCache.set(cacheKey, {
+            messages: messages.reverse(),
+            totalPages,
+        });
+        /////////////////////////////////////////////////////////////////
 
         // Tại sao lại sử dụng reverse()?
         // Khi bạn truy vấn cơ sở dữ liệu để lấy danh sách các tin nhắn (messages),

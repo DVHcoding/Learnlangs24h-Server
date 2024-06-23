@@ -76,6 +76,21 @@ export interface UserRequestType {
     googleId?: string;
 }
 
+export interface MessageResponse {
+    content: string;
+    _id: string;
+    sender: Sender;
+    chat: string;
+    attachments: string[];
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+interface Sender {
+    _id: string;
+    name: string;
+}
+
 export interface NewMessagePayload {
     chatId: string;
     senderId: string;
@@ -87,4 +102,8 @@ export interface MessageForDBType {
     content: string;
     sender: string;
     chat: string;
+}
+export interface CachedMessages {
+    messages: MessageResponse[]; // Thay any bằng kiểu dữ liệu chính xác của messages nếu có
+    totalPages: number;
 }
