@@ -64,6 +64,11 @@ export const getChatDetails = TryCatch(
 
         if (!chat) return next(new ErrorHandler('Chat not found!', 404));
 
+        // Kiểm tra xem người dùng hiện tại có trong danh sách thành viên của cuộc trò chuyện hay không
+        if (!chat.members.some((member) => member._id.toString() === req.user?.id)) {
+            return next(new ErrorHandler('You are not allowed to access this chat!', 403));
+        }
+
         // Trả về phản hồi thành công với danh sách các cuộc trò chuyện đã chuyển đổi
         return res.status(200).json({
             success: true,
