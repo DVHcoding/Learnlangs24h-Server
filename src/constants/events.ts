@@ -14,6 +14,7 @@ const CHAT_JOINED: string = 'CHAT_JOINED';
 const CHAT_LEAVED: string = 'CHAT_LEAVED';
 
 const ONLINE_USERS: string = 'ONLINE_USERS';
+const OFFLINE_USERS: string = 'OFFLINE_USERS';
 
 const ADD_USER: string = 'ADD_USER';
 
@@ -29,5 +30,6 @@ export {
     CHAT_JOINED,
     CHAT_LEAVED,
     ONLINE_USERS,
+    OFFLINE_USERS,
     ADD_USER,
 };

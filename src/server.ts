@@ -13,11 +13,12 @@ dotenv.config();
 // ##########################
 import app from './app.js';
 import connectDatabase from './config/database.js';
-import { ADD_USER, NEW_MESSAGE } from './constants/events.js';
+import { ADD_USER, NEW_MESSAGE, OFFLINE_USERS, ONLINE_USERS } from './constants/events.js';
 import { MessageForDBType, NewMessagePayload } from './types/types.js';
 import Users from './models/Users/userModel.js';
 import Message from './models/Messenger/messageModel.js';
 import ErrorHandler from './utils/errorHandler.js';
+import UserStatus from './models/Users/userStatus.message.js';
 
 ///////////////////////////////////////////////////////////
 // Lấy số lượng CPU của hệ thống
@@ -43,9 +44,17 @@ export const userSocketIDs = new Map();
 interface UserSockets {
     userId: string;
     socketId: string;
+    lastSeen?: string;
+}
+
+interface OfflineUserType {
+    userId: string;
+    socketId: string;
+    lastSeen?: string;
 }
 
 let users: UserSockets[] = [];
+let offlineUsers: OfflineUserType[] = [];
 
 io.on('connection', (socket) => {
     /////////////////////////////////////////////////////////////////
@@ -127,9 +136,45 @@ io.on('connection', (socket) => {
     });
 
     // Lắng nghe sự kiện ngắt kết nối
-    socket.on('disconnect', () => {
-        users = users.filter((user) => user.socketId !== socket.id);
-        io.emit(ADD_USER, users);
+    socket.on('disconnect', async () => {
+        // users = users.filter((user) => user.socketId !== socket.id);
+        // io.emit(ADD_USER, users);
+        const user = users.find((user) => user.socketId === socket.id);
+        if (user) {
+            // Lưu trữ thời gian ngắt kết nối vào cơ sở dữ liệu
+            const lastOnline = new Date().toISOString();
+
+            /////////////////////////////////////////////////////////////////
+            // Cập nhật danh sách người dùng online
+            users = users.filter((user) => user.socketId !== socket.id);
+            user.lastSeen = lastOnline;
+
+            const isOfflineUserExist = offlineUsers.find((offlineUser) => offlineUser.userId === user.userId);
+            if (!isOfflineUserExist) {
+                offlineUsers.push(user);
+            }
+            /////////////////////////////////////////////////////////////////
+
+            /////////////////////////////////////////////////////////////////
+            io.emit(OFFLINE_USERS, offlineUsers);
+            io.emit(ADD_USER, users);
+            /////////////////////////////////////////////////////////////////
+
+            /////////////////////////////////////////////////////////////////
+            try {
+                const userStatus = await UserStatus.findOne({ userId: user.userId });
+
+                if (!userStatus) {
+                    await UserStatus.create({ userId: user.userId, lastOnline });
+                    return;
+                }
+                await UserStatus.findByIdAndUpdate(user.userId, { lastOnline });
+            } catch (error) {
+                return new ErrorHandler(`Có sự cố xảy ra!: ${error}`, 403);
+            }
+
+            /////////////////////////////////////////////////////////////////
+        }
     });
 });
 
