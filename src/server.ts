@@ -168,7 +168,7 @@ io.on('connection', (socket) => {
                     await UserStatus.create({ userId: user.userId, lastOnline });
                     return;
                 }
-                await UserStatus.findByIdAndUpdate(user.userId, { lastOnline });
+                await UserStatus.findOneAndUpdate({ userId: user.userId }, { lastOnline });
             } catch (error) {
                 return new ErrorHandler(`Có sự cố xảy ra!: ${error}`, 403);
             }
