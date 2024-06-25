@@ -117,11 +117,13 @@ io.on('connection', (socket) => {
                 .emit(NEW_MESSAGE, {
                     chatId,
                     message: messageForRealTime,
+                    sender: senderId,
                 });
         } else {
             io.to(sender.socketId).emit(NEW_MESSAGE, {
                 chatId,
                 message: messageForRealTime,
+                sender: senderId,
             });
         }
         /////////////////////////////////////////////////////////////////
