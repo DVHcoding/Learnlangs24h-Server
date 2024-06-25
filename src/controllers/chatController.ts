@@ -13,6 +13,7 @@ import { getOtherMember } from '../utils/helper.js';
 import ErrorHandler from '../utils/errorHandler.js';
 import Message from '../models/Messenger/messageModel.js';
 import { mongoose } from '../libs/libs.js';
+import UserStatus from '../models/Users/userStatus.message.js';
 
 /* -------------------------------------------------------------------------- */
 /*                                     GET                                    */
@@ -174,6 +175,21 @@ export const getMessages = TryCatch(
         /////////////////////////////////////////////////////////////////
     },
 );
+
+export const getUserStatus = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
+    const { userId } = req.query.userId as { userId: string };
+
+    const userStatus = await UserStatus.findOne({ userId });
+
+    if (!userStatus) {
+        return next(new ErrorHandler('UserStatus not found!', 404));
+    }
+
+    return res.status(200).json({
+        success: true,
+        userStatus,
+    });
+});
 
 /* -------------------------------------------------------------------------- */
 /*                                    POST                                    */
