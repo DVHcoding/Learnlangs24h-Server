@@ -177,7 +177,9 @@ export const getMessages = TryCatch(
 );
 
 export const getUserStatus = TryCatch(async (req: Request, res: Response, next: NextFunction) => {
-    const { userId } = req.query.userId as { userId: string };
+    const userId = req.query.userId as string;
+
+    if (!userId) return next(new ErrorHandler('UserId not found!', 404));
 
     const userStatus = await UserStatus.findOne({ userId });
 
