@@ -162,6 +162,7 @@ io.on('connection', (socket) => {
     // Lắng nghe sự kiện SEEN_MESSAGE
     socket.on(SEEN_MESSAGE, async ({ senderId, chatId, members }: SeenMessagePayload) => {
         const chat = await Chat.findById(chatId);
+
         if (senderId === chat?.lastMessage.sender.toString()) {
             return;
         }
@@ -212,6 +213,7 @@ io.on('connection', (socket) => {
         } catch (error) {
             return new ErrorHandler(`Có sự cố xảy ra!: ${error}`, 403);
         }
+
         /////////////////////////////////////////////////////////////////
     });
 
