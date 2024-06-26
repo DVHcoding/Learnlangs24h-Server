@@ -161,6 +161,11 @@ io.on('connection', (socket) => {
 
     // Lắng nghe sự kiện SEEN_MESSAGE
     socket.on(SEEN_MESSAGE, async ({ senderId, chatId, members }: SeenMessagePayload) => {
+        const chat = await Chat.findById(chatId);
+        if (senderId === chat?.lastMessage.sender.toString()) {
+            return;
+        }
+
         /////////////////////////////////////////////////////////////////
         if (!senderId || !chatId || !members) {
             return;
