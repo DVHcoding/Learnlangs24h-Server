@@ -16,6 +16,8 @@ const CHAT_LEAVED: string = 'CHAT_LEAVED';
 const ONLINE_USERS: string = 'ONLINE_USERS';
 const OFFLINE_USERS: string = 'OFFLINE_USERS';
 
+const SEEN_MESSAGE: string = 'SEEN_MESSAGE';
+
 const ADD_USER: string = 'ADD_USER';
 
 export {
@@ -31,5 +33,6 @@ export {
     CHAT_LEAVED,
     ONLINE_USERS,
     OFFLINE_USERS,
+    SEEN_MESSAGE,
     ADD_USER,
 };

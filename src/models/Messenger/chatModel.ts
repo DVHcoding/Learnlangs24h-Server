@@ -1,7 +1,7 @@
 // ##########################
 // #      IMPORT NPM        #
 // ##########################
-import mongoose, { Schema } from 'mongoose';
+import { mongoose, Schema, Types } from '../../libs/libs.js';
 
 export interface MemberType {
     _id: string;
@@ -17,6 +17,11 @@ export interface ChatType extends mongoose.Document {
     groupChat: boolean;
     creator: mongoose.Types.ObjectId;
     members: (mongoose.Types.ObjectId & MemberType)[] & string;
+    lastMessage: {
+        content: string;
+        sender: Types.ObjectId;
+        seen: boolean;
+    };
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -32,15 +37,28 @@ const chatSchema = new Schema(
             default: false,
         },
         creator: {
-            type: mongoose.Types.ObjectId,
+            type: Types.ObjectId,
             ref: 'Users',
         },
         members: [
             {
-                type: mongoose.Types.ObjectId,
+                type: Types.ObjectId,
                 ref: 'Users',
             },
         ],
+        lastMessage: {
+            content: {
+                type: String,
+            },
+            sender: {
+                type: Types.ObjectId,
+                ref: 'Users',
+            },
+            seen: {
+                type: Boolean,
+                default: false,
+            },
+        },
     },
     {
         timestamps: true, // Tự động thêm createdAt và updatedAt

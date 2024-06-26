@@ -107,3 +107,5 @@ export interface CachedMessages {
     messages: MessageResponse[]; // Thay any bằng kiểu dữ liệu chính xác của messages nếu có
     totalPages: number;
 }
+
+export interface SeenMessagePayload extends Omit<NewMessagePayload, 'message'> {}

@@ -13,12 +13,13 @@ dotenv.config();
 // ##########################
 import app from './app.js';
 import connectDatabase from './config/database.js';
-import { ADD_USER, NEW_MESSAGE, OFFLINE_USERS, ONLINE_USERS } from './constants/events.js';
-import { MessageForDBType, NewMessagePayload } from './types/types.js';
+import { ADD_USER, NEW_MESSAGE, OFFLINE_USERS, ONLINE_USERS, SEEN_MESSAGE } from './constants/events.js';
+import { MessageForDBType, NewMessagePayload, SeenMessagePayload } from './types/types.js';
 import Users from './models/Users/userModel.js';
-import Message from './models/Messenger/messageModel.js';
+import Message, { MessageType } from './models/Messenger/messageModel.js';
 import ErrorHandler from './utils/errorHandler.js';
 import UserStatus from './models/Users/userStatus.message.js';
+import Chat from './models/Messenger/chatModel.js';
 
 ///////////////////////////////////////////////////////////
 // Lấy số lượng CPU của hệ thống
@@ -44,13 +45,13 @@ export const userSocketIDs = new Map();
 interface UserSockets {
     userId: string;
     socketId: string;
-    lastSeen?: string;
+    lastOnline?: string;
 }
 
 interface OfflineUserType {
     userId: string;
     socketId: string;
-    lastSeen?: string;
+    lastOnline?: string;
 }
 
 let users: UserSockets[] = [];
@@ -130,7 +131,79 @@ io.on('connection', (socket) => {
 
         /////////////////////////////////////////////////////////////////
         try {
-            await Message.create(messageForDB);
+            const messagePromise = Message.create(messageForDB);
+            const chatPromise = Chat.findById(chatId);
+
+            const [message, chat] = await Promise.all([messagePromise, chatPromise]);
+
+            if (chat) {
+                chat.lastMessage = {
+                    content: message.content,
+                    sender: user?._id || senderId,
+                    seen: false,
+                };
+                await chat.save();
+            }
+
+            if (chat) {
+                chat.lastMessage = {
+                    content: message.content,
+                    sender: user?._id || senderId,
+                    seen: false,
+                };
+                await chat.save();
+            }
+        } catch (error) {
+            return new ErrorHandler(`Có sự cố xảy ra!: ${error}`, 403);
+        }
+        /////////////////////////////////////////////////////////////////
+    });
+
+    // Lắng nghe sự kiện SEEN_MESSAGE
+    socket.on(SEEN_MESSAGE, async ({ senderId, chatId, members }: SeenMessagePayload) => {
+        /////////////////////////////////////////////////////////////////
+        if (!senderId || !chatId || !members) {
+            return;
+        }
+        /////////////////////////////////////////////////////////////////
+
+        /////////////////////////////////////////////////////////////////
+        const sender = users.find((user) => user.userId === senderId);
+        const receivers = members.filter((member) => member !== senderId);
+        const receiversUsers = users.filter((user) => receivers.includes(user.userId));
+
+        if (!sender) {
+            return;
+        }
+
+        /////////////////////////////////////////////////////////////////
+        // Tạo đối tượng tin nhắn để gửi cho client
+        const lastMessage = {
+            _id: uuid(),
+            sender: senderId,
+            seen: true,
+        };
+        /////////////////////////////////////////////////////////////////
+
+        /////////////////////////////////////////////////////////////////
+        if (receiversUsers.length > 0) {
+            io.to(receiversUsers.map((receiver) => receiver.socketId))
+                .to(sender.socketId)
+                .emit(SEEN_MESSAGE, {
+                    chatId,
+                    lastMessage,
+                });
+        } else {
+            io.to(sender.socketId).emit(SEEN_MESSAGE, {
+                chatId,
+                lastMessage,
+            });
+        }
+        /////////////////////////////////////////////////////////////////
+
+        /////////////////////////////////////////////////////////////////
+        try {
+            await Chat.findByIdAndUpdate(chatId, { 'lastMessage.seen': true });
         } catch (error) {
             return new ErrorHandler(`Có sự cố xảy ra!: ${error}`, 403);
         }
@@ -149,7 +222,7 @@ io.on('connection', (socket) => {
             /////////////////////////////////////////////////////////////////
             // Cập nhật danh sách người dùng online
             users = users.filter((user) => user.socketId !== socket.id);
-            user.lastSeen = lastOnline;
+            user.lastOnline = lastOnline;
 
             const isOfflineUserExist = offlineUsers.find((offlineUser) => offlineUser.userId === user.userId);
             if (!isOfflineUserExist) {
