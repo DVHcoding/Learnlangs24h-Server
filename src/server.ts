@@ -1,6 +1,6 @@
-// ##########################
-// #      IMPORT NPM        #
-// ##########################
+/* ########################################################################## */
+/*                                 IMPORT NPM                                 */
+/* ########################################################################## */
 import { v4 as uuid } from 'uuid';
 import dotenv from 'dotenv';
 import { Server } from 'socket.io';
@@ -8,23 +8,15 @@ import { createServer } from 'http';
 import os from 'os';
 dotenv.config();
 
-// ##########################
-// #    IMPORT Components   #
-// ##########################
+/* ########################################################################## */
+/*                              IMPORT COMPONENTS                             */
+/* ########################################################################## */
 import app from './app.js';
 import connectDatabase from './config/database.js';
-import {
-    ADD_USER,
-    NEW_MESSAGE,
-    OFFLINE_USERS,
-    ONLINE_USERS,
-    SEEN_MESSAGE,
-    START_TYPING,
-    STOP_TYPING,
-} from './constants/events.js';
+import { ADD_USER, NEW_MESSAGE, OFFLINE_USERS, SEEN_MESSAGE, START_TYPING, STOP_TYPING } from './constants/events.js';
 import { MessageForDBType, NewMessagePayload, SeenMessagePayload, StartTypingPayload } from './types/types.js';
 import Users from './models/Users/userModel.js';
-import Message, { MessageType } from './models/Messenger/messageModel.js';
+import Message from './models/Messenger/messageModel.js';
 import ErrorHandler from './utils/errorHandler.js';
 import UserStatus from './models/Users/userStatus.message.js';
 import Chat from './models/Messenger/chatModel.js';
