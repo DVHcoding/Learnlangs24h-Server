@@ -40,8 +40,6 @@ const io = new Server(server, {
     },
 });
 
-export const userSocketIDs = new Map();
-
 interface UserSockets {
     userId: string;
     socketId: string;
@@ -60,201 +58,219 @@ let offlineUsers: OfflineUserType[] = [];
 io.on('connection', (socket) => {
     /////////////////////////////////////////////////////////////////
     socket.on(ADD_USER, async ({ userId }) => {
-        const isUserExist = users.find((user) => user.userId === userId);
-        if (!isUserExist) {
-            const user = { userId, socketId: socket.id };
-            users.push(user);
-            io.emit(ADD_USER, users);
+        try {
+            const isUserExist = users.find((user) => user.userId === userId);
+            if (!isUserExist) {
+                const user = { userId, socketId: socket.id };
+                users.push(user);
+                io.emit(ADD_USER, users);
+            }
+        } catch (error) {
+            console.error('Error in ADD_USER event: ', error);
         }
     });
-    /////////////////////////////////////////////////////////////////
 
+    /////////////////////////////////////////////////////////////////
     // Lắng nghe sự kiện NEW_MESSAGE
     socket.on(NEW_MESSAGE, async ({ senderId, chatId, members, message }: NewMessagePayload) => {
-        /////////////////////////////////////////////////////////////////
-        if (!senderId || !chatId || !members || !message) {
-            return;
-        }
-        /////////////////////////////////////////////////////////////////
+        try {
+            /////////////////////////////////////////////////////////////////
+            if (!senderId || !chatId || !members || !message) {
+                return;
+            }
+            /////////////////////////////////////////////////////////////////
 
-        /////////////////////////////////////////////////////////////////
-        const sender = users.find((user) => user.userId === senderId);
-        const receivers = members.filter((member) => member !== senderId);
-        const receiversUsers = users.filter((user) => receivers.includes(user.userId));
-        const user = await Users.findById(senderId);
+            /////////////////////////////////////////////////////////////////
+            const sender = users.find((user) => user.userId === senderId);
+            const receivers = members.filter((member) => member !== senderId);
+            const receiversUsers = users.filter((user) => receivers.includes(user.userId));
+            const user = await Users.findById(senderId);
 
-        if (!sender) {
-            return;
-        }
-        /////////////////////////////////////////////////////////////////
+            if (!sender) {
+                return;
+            }
+            /////////////////////////////////////////////////////////////////
 
-        /////////////////////////////////////////////////////////////////
-        // Tạo đối tượng tin nhắn để gửi cho client
-        const messageForRealTime = {
-            _id: uuid(), // Tạo một ID duy nhất cho tin nhắn
-            content: message,
-            sender: {
-                _id: user?._id, // ID của người gửi tin nhắn
-                name: user?.username, // Tên của người gửi tin nhắn
-            },
-            chat: chatId, // ID của cuộc trò chuyện
-            createdAt: new Date().toISOString(), // Thời gian gửi tin nhắn
-        };
-        /////////////////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////////////
+            // Tạo đối tượng tin nhắn để gửi cho client
+            const messageForRealTime = {
+                _id: uuid(), // Tạo một ID duy nhất cho tin nhắn
+                content: message,
+                sender: {
+                    _id: user?._id, // ID của người gửi tin nhắn
+                    name: user?.username, // Tên của người gửi tin nhắn
+                },
+                chat: chatId, // ID của cuộc trò chuyện
+                createdAt: new Date().toISOString(), // Thời gian gửi tin nhắn
+            };
+            /////////////////////////////////////////////////////////////////
 
-        /////////////////////////////////////////////////////////////////
-        // Tạo đối tượng tin nhắn để lưu vào cơ sở dữ liệu
-        const messageForDB: MessageForDBType = {
-            content: message,
-            sender: user?._id, // ID của người gửi tin nhắn
-            chat: chatId, // ID của cuộc trò chuyện
-        };
-        /////////////////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////////////
+            // Tạo đối tượng tin nhắn để lưu vào cơ sở dữ liệu
+            const messageForDB: MessageForDBType = {
+                content: message,
+                sender: user?._id, // ID của người gửi tin nhắn
+                chat: chatId, // ID của cuộc trò chuyện
+            };
+            /////////////////////////////////////////////////////////////////
 
-        /////////////////////////////////////////////////////////////////
-        if (receiversUsers.length > 0) {
-            io.to(receiversUsers.map((receiver) => receiver.socketId))
-                .to(sender.socketId)
-                .emit(NEW_MESSAGE, {
+            /////////////////////////////////////////////////////////////////
+            if (receiversUsers.length > 0) {
+                io.to(receiversUsers.map((receiver) => receiver.socketId))
+                    .to(sender.socketId)
+                    .emit(NEW_MESSAGE, {
+                        chatId,
+                        message: messageForRealTime,
+                        sender: senderId,
+                    });
+            } else {
+                io.to(sender.socketId).emit(NEW_MESSAGE, {
                     chatId,
                     message: messageForRealTime,
                     sender: senderId,
                 });
-        } else {
-            io.to(sender.socketId).emit(NEW_MESSAGE, {
-                chatId,
-                message: messageForRealTime,
-                sender: senderId,
-            });
-        }
-        /////////////////////////////////////////////////////////////////
-
-        /////////////////////////////////////////////////////////////////
-        try {
-            const messagePromise = Message.create(messageForDB);
-            const chatPromise = Chat.findById(chatId);
-
-            const [message, chat] = await Promise.all([messagePromise, chatPromise]);
-
-            if (chat) {
-                chat.lastMessage = {
-                    content: message.content,
-                    sender: user?._id || senderId,
-                    seen: false,
-                };
-                await chat.save();
             }
+            /////////////////////////////////////////////////////////////////
 
-            if (chat) {
-                chat.lastMessage = {
-                    content: message.content,
-                    sender: user?._id || senderId,
-                    seen: false,
-                };
-                await chat.save();
+            /////////////////////////////////////////////////////////////////
+            try {
+                const messagePromise = Message.create(messageForDB);
+                const chatPromise = Chat.findById(chatId);
+
+                const [message, chat] = await Promise.all([messagePromise, chatPromise]);
+
+                if (chat) {
+                    chat.lastMessage = {
+                        content: message.content,
+                        sender: user?._id || senderId,
+                        seen: false,
+                    };
+                    await chat.save();
+                }
+
+                if (chat) {
+                    chat.lastMessage = {
+                        content: message.content,
+                        sender: user?._id || senderId,
+                        seen: false,
+                    };
+                    await chat.save();
+                }
+            } catch (error) {
+                console.error('Error create new Message: ', error);
             }
+            /////////////////////////////////////////////////////////////////
         } catch (error) {
-            return new ErrorHandler(`Có sự cố xảy ra!: ${error}`, 403);
+            console.error('Error in NEW_MESSAGE event: ', error);
         }
-        /////////////////////////////////////////////////////////////////
     });
 
     // Lắng nghe sự kiện SEEN_MESSAGE
     socket.on(SEEN_MESSAGE, async ({ senderId, chatId, members }: SeenMessagePayload) => {
-        const chat = await Chat.findById(chatId);
+        try {
+            /////////////////////////////////////////////////////////////////
+            if (!senderId || !chatId || !members) {
+                return;
+            }
+            const chat = await Chat.findById(chatId);
+            if (senderId === chat?.lastMessage.sender.toString()) {
+                return;
+            }
+            /////////////////////////////////////////////////////////////////
 
-        if (senderId === chat?.lastMessage.sender.toString()) {
-            return;
-        }
+            /////////////////////////////////////////////////////////////////
+            const sender = users.find((user) => user.userId === senderId);
+            const receivers = members.filter((member) => member !== senderId);
+            const receiversUsers = users.filter((user) => receivers.includes(user.userId));
 
-        /////////////////////////////////////////////////////////////////
-        if (!senderId || !chatId || !members) {
-            return;
-        }
-        /////////////////////////////////////////////////////////////////
+            if (!sender) {
+                return;
+            }
+            /////////////////////////////////////////////////////////////////
 
-        /////////////////////////////////////////////////////////////////
-        const sender = users.find((user) => user.userId === senderId);
-        const receivers = members.filter((member) => member !== senderId);
-        const receiversUsers = users.filter((user) => receivers.includes(user.userId));
+            /////////////////////////////////////////////////////////////////
+            // Tạo đối tượng tin nhắn để gửi cho client
+            const lastMessage = {
+                _id: uuid(),
+                sender: senderId,
+                seen: true,
+            };
+            /////////////////////////////////////////////////////////////////
 
-        if (!sender) {
-            return;
-        }
-
-        /////////////////////////////////////////////////////////////////
-        // Tạo đối tượng tin nhắn để gửi cho client
-        const lastMessage = {
-            _id: uuid(),
-            sender: senderId,
-            seen: true,
-        };
-        /////////////////////////////////////////////////////////////////
-
-        /////////////////////////////////////////////////////////////////
-        if (receiversUsers.length > 0) {
-            io.to(receiversUsers.map((receiver) => receiver.socketId))
-                .to(sender.socketId)
-                .emit(SEEN_MESSAGE, {
+            /////////////////////////////////////////////////////////////////
+            if (receiversUsers.length > 0) {
+                io.to(receiversUsers.map((receiver) => receiver.socketId))
+                    .to(sender.socketId)
+                    .emit(SEEN_MESSAGE, {
+                        chatId,
+                        lastMessage,
+                    });
+            } else {
+                io.to(sender.socketId).emit(SEEN_MESSAGE, {
                     chatId,
                     lastMessage,
                 });
-        } else {
-            io.to(sender.socketId).emit(SEEN_MESSAGE, {
-                chatId,
-                lastMessage,
-            });
-        }
-        /////////////////////////////////////////////////////////////////
+            }
+            /////////////////////////////////////////////////////////////////
 
-        /////////////////////////////////////////////////////////////////
-        try {
-            await Chat.findByIdAndUpdate(chatId, { 'lastMessage.seen': true });
+            /////////////////////////////////////////////////////////////////
+            try {
+                await Chat.findByIdAndUpdate(chatId, { 'lastMessage.seen': true });
+            } catch (error) {
+                console.error('Error update chat models: ', error);
+            }
+            /////////////////////////////////////////////////////////////////
         } catch (error) {
-            return new ErrorHandler(`Có sự cố xảy ra!: ${error}`, 403);
+            console.error('Error in SEEN_MESSAGE event: ', error);
         }
-
-        /////////////////////////////////////////////////////////////////
     });
 
     socket.on(START_TYPING, async ({ senderId, chatId, members }: StartTypingPayload) => {
-        /////////////////////////////////////////////////////////////////
-        if (!senderId || !chatId || !members) {
-            return;
-        }
-        /////////////////////////////////////////////////////////////////
+        try {
+            /////////////////////////////////////////////////////////////////
+            if (!senderId || !chatId || !members) {
+                return;
+            }
+            /////////////////////////////////////////////////////////////////
 
-        /////////////////////////////////////////////////////////////////
-        const receivers = members.filter((member) => member !== senderId);
-        const receiversUsers = users.filter((user) => receivers.includes(user.userId));
+            /////////////////////////////////////////////////////////////////
+            const receivers = members.filter((member) => member !== senderId);
+            const receiversUsers = users.filter((user) => receivers.includes(user.userId));
 
-        /////////////////////////////////////////////////////////////////
-        if (receiversUsers.length > 0) {
-            io.to(receiversUsers.map((receiver) => receiver.socketId)).emit(START_TYPING, {
-                chatId,
-            });
+            /////////////////////////////////////////////////////////////////
+            if (receiversUsers.length > 0) {
+                io.to(receiversUsers.map((receiver) => receiver.socketId)).emit(START_TYPING, {
+                    chatId,
+                });
+            }
+            /////////////////////////////////////////////////////////////////
+        } catch (error) {
+            console.error('Error in START_TYPING event: ', error);
         }
-        /////////////////////////////////////////////////////////////////
     });
 
     socket.on(STOP_TYPING, async ({ senderId, chatId, members }: StartTypingPayload) => {
-        /////////////////////////////////////////////////////////////////
-        if (!senderId || !chatId || !members) {
-            return;
-        }
-        /////////////////////////////////////////////////////////////////
+        try {
+            /////////////////////////////////////////////////////////////////
+            if (!senderId || !chatId || !members) {
+                return;
+            }
+            /////////////////////////////////////////////////////////////////
 
-        /////////////////////////////////////////////////////////////////
-        const receivers = members.filter((member) => member !== senderId);
-        const receiversUsers = users.filter((user) => receivers.includes(user.userId));
+            /////////////////////////////////////////////////////////////////
+            const receivers = members.filter((member) => member !== senderId);
+            const receiversUsers = users.filter((user) => receivers.includes(user.userId));
 
-        /////////////////////////////////////////////////////////////////
-        if (receiversUsers.length > 0) {
-            io.to(receiversUsers.map((receiver) => receiver.socketId)).emit(STOP_TYPING, {
-                chatId,
-            });
+            /////////////////////////////////////////////////////////////////
+            if (receiversUsers.length > 0) {
+                io.to(receiversUsers.map((receiver) => receiver.socketId)).emit(STOP_TYPING, {
+                    chatId,
+                });
+            }
+            /////////////////////////////////////////////////////////////////
+        } catch (error) {
+            console.error('Error in STOP_TYPING event: ', error);
         }
-        /////////////////////////////////////////////////////////////////
     });
 
     // Lắng nghe sự kiện ngắt kết nối
