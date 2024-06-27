@@ -109,3 +109,7 @@ export interface CachedMessages {
 }
 
 export interface SeenMessagePayload extends Omit<NewMessagePayload, 'message'> {}
+
+export interface StartTypingPayload extends SeenMessagePayload {}
+
+export interface StopTypingPayload extends StartTypingPayload {}

@@ -13,8 +13,16 @@ dotenv.config();
 // ##########################
 import app from './app.js';
 import connectDatabase from './config/database.js';
-import { ADD_USER, NEW_MESSAGE, OFFLINE_USERS, ONLINE_USERS, SEEN_MESSAGE } from './constants/events.js';
-import { MessageForDBType, NewMessagePayload, SeenMessagePayload } from './types/types.js';
+import {
+    ADD_USER,
+    NEW_MESSAGE,
+    OFFLINE_USERS,
+    ONLINE_USERS,
+    SEEN_MESSAGE,
+    START_TYPING,
+    STOP_TYPING,
+} from './constants/events.js';
+import { MessageForDBType, NewMessagePayload, SeenMessagePayload, StartTypingPayload } from './types/types.js';
 import Users from './models/Users/userModel.js';
 import Message, { MessageType } from './models/Messenger/messageModel.js';
 import ErrorHandler from './utils/errorHandler.js';
@@ -214,6 +222,46 @@ io.on('connection', (socket) => {
             return new ErrorHandler(`Có sự cố xảy ra!: ${error}`, 403);
         }
 
+        /////////////////////////////////////////////////////////////////
+    });
+
+    socket.on(START_TYPING, async ({ senderId, chatId, members }: StartTypingPayload) => {
+        /////////////////////////////////////////////////////////////////
+        if (!senderId || !chatId || !members) {
+            return;
+        }
+        /////////////////////////////////////////////////////////////////
+
+        /////////////////////////////////////////////////////////////////
+        const receivers = members.filter((member) => member !== senderId);
+        const receiversUsers = users.filter((user) => receivers.includes(user.userId));
+
+        /////////////////////////////////////////////////////////////////
+        if (receiversUsers.length > 0) {
+            io.to(receiversUsers.map((receiver) => receiver.socketId)).emit(START_TYPING, {
+                chatId,
+            });
+        }
+        /////////////////////////////////////////////////////////////////
+    });
+
+    socket.on(STOP_TYPING, async ({ senderId, chatId, members }: StartTypingPayload) => {
+        /////////////////////////////////////////////////////////////////
+        if (!senderId || !chatId || !members) {
+            return;
+        }
+        /////////////////////////////////////////////////////////////////
+
+        /////////////////////////////////////////////////////////////////
+        const receivers = members.filter((member) => member !== senderId);
+        const receiversUsers = users.filter((user) => receivers.includes(user.userId));
+
+        /////////////////////////////////////////////////////////////////
+        if (receiversUsers.length > 0) {
+            io.to(receiversUsers.map((receiver) => receiver.socketId)).emit(STOP_TYPING, {
+                chatId,
+            });
+        }
         /////////////////////////////////////////////////////////////////
     });
 
